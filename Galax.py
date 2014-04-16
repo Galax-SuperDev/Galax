@@ -223,6 +223,19 @@ class Controlleur:
         self.jeu=Jeu(self)
         self.vue=Vue(self.jeu.etoiles)
         self.vue.root.mainloop()
+		
+	def gameLoop():
+        for i in range(self.tic):
+            for faction in jeu.listeFaction:
+                for etoile in faction.listeEtoiles:
+                    for flotte in etoile.listeFlotte:
+                        if(i==0):
+                            if(flotte.destination != None):
+                                calcTravelTime()
+                        if(flotte.isMoving):
+                            updateTravelTime()
+                        if(travelTime == 0):
+                            flotte.isMoving=False
         
 if __name__ == '__main__':
     c=Controlleur()
