@@ -63,16 +63,18 @@ class Gubru(Faction):
 
 class Jeu:
     def __init__(self,parent):
+        self.parent = parent
         self.humain = Humain()
         self.czin = Czin()
         self.gubru = Gubru()
-        self.etoiles = creeEtoiles()
         self.sizeCase = 16
+        self.etoiles = self.creeEtoiles(16)
+        
        
     def creeEtoiles(self,nbEtoiles):
-        etoiles = []
-        posX = random.randint(0,(parent.width-1)/self.sizeCase)
-        posY = random.randint(0,(parent.height-1)/self.sizeCase)
+        etoilesTemp = []
+        posX = random.randint(0,100)
+        posY = random.randint(0,100)
         posValide = False
         for i in range(0,nbEtoiles):
             while posValide == False:
@@ -87,7 +89,7 @@ class Jeu:
                         posValide = True
                         
                     # si la position de l'etoile est egale a la position d'une autre etoile   
-                    for e in self.etoiles:
+                    for e in etoilesTemp:
                         if(posX == e.posX and posY == e.posY):
                             posValide = False
                         else:
@@ -96,8 +98,8 @@ class Jeu:
                     if(posValide == False):
                         posX = random.randint(0,(parent.width-1)/self.sizeCase)
                         posY = random.randint(0,(parent.height-1)/self.sizeCase)
-            etoiles.append(Etoile(posX,posY,"Zimbaboo","Neutral"))
-        return etoiles
+            etoilesTemp.append(Etoile(posX,posY,"Zimbaboo","Neutral"))
+        return etoilesTemp
     
     def AjoutVaisseau(self):
         # ajout dans toutes les etoiles sauf etoiles mere
@@ -135,7 +137,10 @@ class Vue:
                                      fill='gray',tags='menuBar')
           
         self.canvas.pack(expand=True, fill=BOTH)
-
+        self.drawEtoiles()
+        
+    def drawEtoiles(self):
+        self.canvas.create_oval(10,10,20,20,fill='green')
 
     def resize(self,event):
         self.screenWidth = event.width
@@ -154,6 +159,7 @@ class Vue:
 
 class Controlleur:
     def __init__(self):
+        self.jeu=Jeu(self)
         self.vue=Vue(self)
         self.vue.root.mainloop() 
         
