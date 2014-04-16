@@ -8,40 +8,46 @@ class Etoile:
         self.posY = posY
         self.nom = nom
         self.nbUsine = random.randint(0,6)
-        self.flotte = Flotte("neutral",0)
+        self.listeFlotte = []
         self.spyRank = 0
         self.owner = owner
-        #self.type = random(0 .... n)
+        self.listeFlotte[0].append(Flotte(self,100))
+    
+    def AjoutVaisseau(self): 
+        self.flotte.nbVaisseaux += self.nbUsine
         
 class Flotte:
     def __init__(self,owner,nbVaisseaux):
         self.owner = owner
         self.nbVaisseaux = nbVaisseaux
         self.travelTime = 0
-        self.positionCourante = None
-        self.desitnation = None
+        self.destination = None
+        self.isMoving = False
 
     def calcTravelTime(self):
-        distance = abs((self.destination.posX - self.positionCourante.posX)+
-                            (self.desitnation.posY - self.positionCourante.posY))
+        distance = abs((self.destination.posX - self.owner.posX)+
+                            (self.destination.posY - self.owner.posY))
         if(distance <= 2):
             self.travelTime = distance/2
         else:
             self.travelTime = 1+((distance-2)/3)
+    
+    def updateTravelTime(self):
+        travelTime -= 0.1
+    
+    def setDestination(etoile):
+        self.destination = etoile
 
 class Faction:
     def __init__(self):
         self.etoiles=[]
-        self.flottes=[]
 
 class Humain(Faction):
     def __init__(self):
         Faction.__init__(self)
         self.nom = 'Humain'
-        self.etoiles.append(Etoile(10,10,"Ohm","Humain"))
+        self.etoiles.append(Etoile(10,10,"Ohm",self))
         self.etoiles[0].nbUsine = 10
-        self.flottes.append(Flotte("Humain",100))
-        self.flottes[0].positionCourante = self.etoiles[0]
         
 class Czin(Faction):
     def __init__(self):
@@ -49,14 +55,14 @@ class Czin(Faction):
         self.nom = 'Czin'
         self.etoiles.append(Etoile(20,30,"Cygnus X-1","Czin"))
         self.etoiles[0].nbUsine = 10
-        self.flottes.append(Flotte("Czin",100))
+        self.flottes.append(Flotte(self.nom,100))
         self.flottes[0].positionCourante = self.etoiles[0]
                 
 class Gubru(Faction):
     def __init__(self):
         Faction.__init__(self)
         self.nom = 'Gubru'
-        self.etoiles.append(Etoile(50,60,"Granatovaya","Gubru"))
+        self.etoiles.append(Etoile(20,30,"Granatovaya","Gubru"))
         self.etoiles[0].nbUsine = 10
         self.flottes.append(Flotte("Gubru",100))
         self.flottes[0].positionCourante = self.etoiles[0]
