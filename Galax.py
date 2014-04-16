@@ -56,7 +56,7 @@ class Gubru(Faction):
     def __init__(self):
         Faction.__init__(self)
         self.nom = 'Gubru'
-        self.etoiles.append(Etoile(20,30,"Granatovaya","Gubru"))
+        self.etoiles.append(Etoile(50,60,"Granatovaya","Gubru"))
         self.etoiles[0].nbUsine = 10
         self.flottes.append(Flotte("Gubru",100))
         self.flottes[0].positionCourante = self.etoiles[0]
@@ -67,38 +67,37 @@ class Jeu:
         self.humain = Humain()
         self.czin = Czin()
         self.gubru = Gubru()
-        self.sizeCase = 16
-        self.etoiles = self.creeEtoiles(16)
-        
+        self.etoiles = self.creeEtoiles(8)
        
     def creeEtoiles(self,nbEtoiles):
         etoilesTemp = []
-        posX = random.randint(0,100)
-        posY = random.randint(0,100)
-        posValide = False
         for i in range(0,nbEtoiles):
-            while posValide == False:
-                    # si la position de l'etoile est egale a la position d'une etoile mere
-                    if( posX==self.humain.etoiles[0].posX and posY==self.humain.etoiles[0].posY):
-                        posValide = False
-                    elif( posX==self.gubru.etoiles[0].posX and posY==self.gubru.etoiles[0].posY):
-                        posValide = False
-                    elif( posX==self.czin.etoiles[0].posX and posY==self.czin.etoiles[0].posY):
+            posX = random.randint(0,100)
+            posY = random.randint(0,100)
+            posValide = False
+            while posValide == False:    
+                # si la position de l'etoile est egale a la position d'une etoile mere
+                if( posX==self.humain.etoiles[0].posX and posY==self.humain.etoiles[0].posY):
+                    posValide = False
+                elif( posX==self.gubru.etoiles[0].posX and posY==self.gubru.etoiles[0].posY):
+                    posValide = False
+                elif( posX==self.czin.etoiles[0].posX and posY==self.czin.etoiles[0].posY):
+                    posValide = False
+                else:
+                    posValide = True
+                    
+                # si la position de l'etoile est egale a la position d'une autre etoile   
+                for e in etoilesTemp:
+                    if(posX == e.posX and posY == e.posY):
                         posValide = False
                     else:
                         posValide = True
-                        
-                    # si la position de l'etoile est egale a la position d'une autre etoile   
-                    for e in etoilesTemp:
-                        if(posX == e.posX and posY == e.posY):
-                            posValide = False
-                        else:
-                            posValide = True
-                    # si la position n'est pas valide on donne une nouvelle position a l'etoile et on recommence la boucle
-                    if(posValide == False):
-                        posX = random.randint(0,(parent.width-1)/self.sizeCase)
-                        posY = random.randint(0,(parent.height-1)/self.sizeCase)
+                # si la position n'est pas valide on donne une nouvelle position a l'etoile et on recommence la boucle
+                if(posValide == False):
+                    posX = random.randint(0,100)
+                    posY = random.randint(0,100)
             etoilesTemp.append(Etoile(posX,posY,"Zimbaboo","Neutral"))
+            print(str(posX)+' '+str(posY))
         return etoilesTemp
     
     def AjoutVaisseau(self):
@@ -110,11 +109,9 @@ class Jeu:
         self.gubru.flottes[0].nbVaisseaux += self.gubru.etoiles[0].nbUsine
         self.humain.flottes[0].nbVaisseaux += self.humain.etoiles[0].nbUsine
             
-        
-        
 class Vue:
-    def __init__(self,parent):
-        self.parent=parent
+    def __init__(self,listeEtoile):
+        self.listeEtoiles = listeEtoile
         self.root=Tk()
               
         self.root.title('Galax')
@@ -127,27 +124,34 @@ class Vue:
         self.canvas=Canvas(self.root, width=self.screenWidth, height=self.screenHeight, bg='black')  
               
         self.canvas.bind('<Configure>', self.resize)
+    
+        self.canvas.pack(expand=True, fill=BOTH)
         
+        self.drawMenu()
+        '''
         self.canvas.create_rectangle(0,self.screenHeight-128,
-                                     self.screenWidth,self.screenHeight,
-                                     fill='gray',tags='menuBar')
+                             self.screenWidth,self.screenHeight,
+                             fill='gray',tags='menuBar')
         
         self.canvas.create_rectangle(self.screenWidth-256,0,
                                      self.screenWidth,self.screenHeight-256,
                                      fill='gray',tags='menuBar')
-          
-        self.canvas.pack(expand=True, fill=BOTH)
-        self.drawEtoiles()
         
-    def drawEtoiles(self):
-        self.canvas.create_oval(10,10,20,20,fill='green')
+        self.background = PhotoImage(file="cosmosBG.gif")
+        #self.background.zoom(self.width, self.height)
+        self.canvas.create_image(0,0,anchor=NW,image=self.background)
 
+        self.drawEtoiles()
+        '''
     def resize(self,event):
         self.screenWidth = event.width
         self.screenHeight = event.height
         self.width = self.screenWidth-256;
         self.height = self.screenHeight-128;
-
+        
+        self.drawMenu()
+        
+        '''
         self.canvas.delete("menuBar")
         self.canvas.create_rectangle(0,self.screenHeight-128,
                                      self.screenWidth,self.screenHeight,
@@ -156,12 +160,50 @@ class Vue:
         self.canvas.create_rectangle(self.screenWidth-256,0,
                                      self.screenWidth,self.screenHeight-128,
                                      fill='gray',tags="menuBar")
+        '''
+        
+    def drawMenu(self):
+        self.buttonWidth = 200
+        self.buttonHeight = 64
+        self.canvas.delete("menu")
+        self.canvas.create_rectangle(((self.screenWidth/2)-self.buttonWidth/2),self.screenHeight/3,
+                                     ((self.screenWidth/2)-self.buttonWidth/2)+self.buttonWidth,(self.screenHeight/3)+self.buttonHeight,fill='gray',activefill='white',tags='menu')
+        
+        self.canvas.create_rectangle(((self.screenWidth/2)-self.buttonWidth/2),(self.screenHeight/3)+self.buttonHeight+2,
+                                     ((self.screenWidth/2)-self.buttonWidth/2)+self.buttonWidth,(self.screenHeight/3)+(self.buttonHeight*2)+2,fill='gray',activefill='white',tags='menu')
+        
+        self.canvas.create_rectangle(((self.screenWidth/2)-self.buttonWidth/2),(self.screenHeight/3)+(self.buttonHeight*2)+4,
+                                     ((self.screenWidth/2)-self.buttonWidth/2)+self.buttonWidth,(self.screenHeight/3)+(self.buttonHeight*3)+4,fill='gray',activefill='white',tags='menu')
+        
+        self.canvas.create_text(((self.screenWidth/2)-self.buttonWidth/2)+100,(self.screenHeight/3)+32,
+                                text='New game',fill='black',activefill='white',
+                                font=('consolas','16'),
+                                tags='menu')
+        self.canvas.create_text(((self.screenWidth/2)-self.buttonWidth/2)+100,(self.screenHeight/3)+96,
+                                text='High scores',
+                                fill='black',activefill='white',
+                                font=('consolas','16'),
+                                tags='menu')
+        self.canvas.create_text(((self.screenWidth/2)-self.buttonWidth/2)+100,(self.screenHeight/3)+160,
+                                text='Quit game',
+                                fill='black',activefill='white',
+                                font=('consolas','16'),
+                                tags='menu')
+        
+    def drawEtoiles(self):
+        for e in self.listeEtoiles:
+            posX = int((e.posX*self.width-100)/100)
+            posY = int((e.posY*self.height-100)/100)
+            self.canvas.create_oval(posX,posY,posX+32,posY+32,fill='green')
+            print(str(posX)+' '+str(posY))
+
+
 
 class Controlleur:
     def __init__(self):
         self.jeu=Jeu(self)
-        self.vue=Vue(self)
-        self.vue.root.mainloop() 
+        self.vue=Vue(self.jeu.etoiles)
+        self.vue.root.mainloop()
         
 if __name__ == '__main__':
     c=Controlleur()
