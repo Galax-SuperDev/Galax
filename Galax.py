@@ -124,6 +124,7 @@ class Vue:
         self.canvas=Canvas(self.root, width=self.screenWidth, height=self.screenHeight, bg='black')  
               
         self.canvas.bind('<Configure>', self.resize)
+        self.canvas.bind('<Button-1>', self.click)
     
         self.canvas.pack(expand=True, fill=BOTH)
         
@@ -143,6 +144,11 @@ class Vue:
 
         self.drawEtoiles()
         '''
+    def click(self,event):
+        eventX = event.x
+        eventY = event.y
+        print(str(eventX)+str(eventY))
+    
     def resize(self,event):
         self.screenWidth = event.width
         self.screenHeight = event.height
@@ -163,28 +169,37 @@ class Vue:
         '''
         
     def drawMenu(self):
+        
         self.buttonWidth = 200
         self.buttonHeight = 64
+        
+        buttonPosX = ((self.screenWidth/2)-self.buttonWidth/2)
+        buttonPosY = self.screenHeight/3
+        
         self.canvas.delete("menu")
-        self.canvas.create_rectangle(((self.screenWidth/2)-self.buttonWidth/2),self.screenHeight/3,
-                                     ((self.screenWidth/2)-self.buttonWidth/2)+self.buttonWidth,(self.screenHeight/3)+self.buttonHeight,fill='gray',activefill='white',tags='menu')
         
-        self.canvas.create_rectangle(((self.screenWidth/2)-self.buttonWidth/2),(self.screenHeight/3)+self.buttonHeight+2,
-                                     ((self.screenWidth/2)-self.buttonWidth/2)+self.buttonWidth,(self.screenHeight/3)+(self.buttonHeight*2)+2,fill='gray',activefill='white',tags='menu')
+        self.canvas.create_rectangle(buttonPosX, buttonPosY,
+                                     buttonPosX+self.buttonWidth, buttonPosY+self.buttonHeight, 
+                                     fill='gray', activefill='white', tags='menu')
         
-        self.canvas.create_rectangle(((self.screenWidth/2)-self.buttonWidth/2),(self.screenHeight/3)+(self.buttonHeight*2)+4,
-                                     ((self.screenWidth/2)-self.buttonWidth/2)+self.buttonWidth,(self.screenHeight/3)+(self.buttonHeight*3)+4,fill='gray',activefill='white',tags='menu')
+        self.canvas.create_rectangle(buttonPosX, buttonPosY+self.buttonHeight+2,
+                                     buttonPosX+self.buttonWidth, buttonPosY+(self.buttonHeight*2)+2, 
+                                     fill='gray', activefill='white', tags='menu')
         
-        self.canvas.create_text(((self.screenWidth/2)-self.buttonWidth/2)+100,(self.screenHeight/3)+32,
+        self.canvas.create_rectangle(buttonPosX,buttonPosY+(self.buttonHeight*2)+4,
+                                     buttonPosX+self.buttonWidth,buttonPosY+(self.buttonHeight*3)+4,
+                                     fill='gray',activefill='white',tags='menu')
+        
+        self.canvas.create_text(buttonPosX+100,buttonPosY+32,
                                 text='New game',fill='black',activefill='white',
                                 font=('consolas','16'),
                                 tags='menu')
-        self.canvas.create_text(((self.screenWidth/2)-self.buttonWidth/2)+100,(self.screenHeight/3)+96,
+        self.canvas.create_text(buttonPosX+100,buttonPosY+96,
                                 text='High scores',
                                 fill='black',activefill='white',
                                 font=('consolas','16'),
                                 tags='menu')
-        self.canvas.create_text(((self.screenWidth/2)-self.buttonWidth/2)+100,(self.screenHeight/3)+160,
+        self.canvas.create_text(buttonPosX+100,buttonPosY+160,
                                 text='Quit game',
                                 fill='black',activefill='white',
                                 font=('consolas','16'),
@@ -196,8 +211,6 @@ class Vue:
             posY = int((e.posY*self.height-100)/100)
             self.canvas.create_oval(posX,posY,posX+32,posY+32,fill='green')
             print(str(posX)+' '+str(posY))
-
-
 
 class Controlleur:
     def __init__(self):
