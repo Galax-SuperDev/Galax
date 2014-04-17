@@ -1,82 +1,6 @@
 import random
 import math
 
-#######################################################
-class Etoile:
-    def __init__(self,posX,posY,nom,owner):
-        self.posX = posX
-        self.posY = posY
-        self.nom = nom
-        self.nbUsine = random.randint(0,6)
-        self.listeFlotte = []
-        self.spyRank = 0
-        self.owner = owner
-        self.listeFlotte.append(Flotte(self,100))
-    
-    def AjoutVaisseau(self): 
-        self.flotte.nbVaisseaux += self.nbUsine
-        
-
-
-#######################################################
-class Flotte:
-    def __init__(self,owner,nbVaisseaux):
-        self.owner = owner
-        self.nbVaisseaux = nbVaisseaux
-        self.travelTime = 0
-        self.destination = None
-        self.isMoving = False
-
-    def calcTravelTime(self):
-        distance = abs((self.destination.posX - self.owner.posX)+
-                            (self.destination.posY - self.owner.posY))
-        if(distance <= 2):
-            self.travelTime = distance/2
-        else:
-            self.travelTime = 1+((distance-2)/3)
-    
-    def updateTravelTime(self):
-        travelTime -= 0.1
-    
-    def setDestination(self,etoile):
-        self.destination = etoile
-
-
-
-
-
-#######################################################
-class Faction:
-    def __init__(self):
-        self.etoiles=[]
-
-class Humain(Faction):
-    def __init__(self):
-        Faction.__init__(self)
-        self.nom = 'Humain'
-        self.etoiles.append(Etoile(10,10,"Ohm",self))
-        self.etoiles[0].nbUsine = 10
-        
-class Czin(Faction):
-    def __init__(self):
-        Faction.__init__(self)
-        self.nom = 'Czin'
-        self.etoiles.append(Etoile(20,30,"Cygnus X-1",self))
-        self.etoiles[0].nbUsine = 10
-                
-class Gubru(Faction):
-    def __init__(self):
-        Faction.__init__(self)
-        self.nom = 'Gubru'
-        self.etoiles.append(Etoile(20,30,"Granatovaya",self))
-        self.etoiles[0].nbUsine = 10
-
-class Neutral(Faction):
-    def __init__(self):
-        self.nom = 'Neutral'
-
-
-
 
 
 #######################################################
@@ -127,3 +51,82 @@ class Jeu:
         self.czin.flottes[0].nbVaisseaux += self.czin.etoiles[0].nbUsine
         self.gubru.flottes[0].nbVaisseaux += self.gubru.etoiles[0].nbUsine
         self.humain.flottes[0].nbVaisseaux += self.humain.etoiles[0].nbUsine
+
+
+
+#######################################################
+class Faction:
+    def __init__(self):
+        self.etoiles=[]
+
+class Humain(Faction):
+    def __init__(self):
+        Faction.__init__(self)
+        self.nom = 'Humain'
+        self.etoiles.append(Etoile(10,10,"Ohm",self))
+        self.etoiles[0].nbUsine = 10
+        
+class Czin(Faction):
+    def __init__(self):
+        Faction.__init__(self)
+        self.nom = 'Czin'
+        self.etoiles.append(Etoile(20,30,"Cygnus X-1",self))
+        self.etoiles[0].nbUsine = 10
+                
+class Gubru(Faction):
+    def __init__(self):
+        Faction.__init__(self)
+        self.nom = 'Gubru'
+        self.etoiles.append(Etoile(20,30,"Granatovaya",self))
+        self.etoiles[0].nbUsine = 10
+
+class Neutral(Faction):
+    def __init__(self):
+        self.nom = 'Neutral'
+        self.setListEtoile()
+
+    def setListEtoile(self):
+
+
+#######################################################
+class Etoile:
+    def __init__(self,posX,posY,nom,owner):
+        self.posX = posX
+        self.posY = posY
+        self.nom = nom
+        self.nbUsine = random.randint(0,6)
+        self.listeFlotte = []
+        self.spyRank = 0
+        self.owner = owner
+        if(not isinstance(owner, Neutral)):# lorsque le proprio de l'etoile n'est pas un neutral
+            self.listeFlotte.append(Flotte(self,100))
+        else:
+    
+    def AjoutVaisseau(self): 
+        self.flotte.nbVaisseaux += self.nbUsine
+        
+
+
+#######################################################
+class Flotte:
+    def __init__(self,owner,nbVaisseaux):
+        self.owner = owner
+        self.nbVaisseaux = nbVaisseaux
+        self.travelTime = 0
+        self.destination = None
+        self.isMoving = False
+
+    def calcTravelTime(self):
+        distance = abs((self.destination.posX - self.owner.posX)+
+                            (self.destination.posY - self.owner.posY))
+        if(distance <= 2):
+            self.travelTime = distance/2
+        else:
+            self.travelTime = 1+((distance-2)/3)
+    
+    def updateTravelTime(self):
+        travelTime -= 0.1
+    
+    def setDestination(self,etoile):
+        self.destination = etoile
+        
