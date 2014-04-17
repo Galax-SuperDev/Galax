@@ -22,17 +22,7 @@ class Controlleur:
 
 		
     def gameLoop(self):
-        for i in range(self.tic):
-            for faction in jeu.listeFaction:
-                for etoile in faction.listeEtoiles:
-                    for flotte in etoile.listeFlotte:
-                        if(i==0):
-                            if(flotte.destination != None and not flotte.travelTime > 0 ): #Verif si il y a une destination, et si le temps de voyage n'est pas deja calculer
-                                flotte.calcTravelTime()
-                        if(flotte.isMoving):
-                            flotte.updateTravelTime()
-                        if(travelTime == 0):
-                            flotte.isMoving=False
+        self.jeu.updateFlotte()
         
 if __name__ == '__main__':
     c=Controlleur()

@@ -20,7 +20,7 @@ class Jeu:
                     grosseListeEtoile.append(etoile)
         return grosseListeEtoile
     
-    def AjoutVaisseau(self):
+    def ajoutVaisseau(self):
         # ajout dans toutes les etoiles sauf etoiles mere
         for e in self.etoiles:
             e.flotte.nbVaisseaux += e.nbUsine
@@ -28,6 +28,26 @@ class Jeu:
         self.czin.flottes[0].nbVaisseaux += self.czin.etoiles[0].nbUsine
         self.gubru.flottes[0].nbVaisseaux += self.gubru.etoiles[0].nbUsine
         self.humain.flottes[0].nbVaisseaux += self.humain.etoiles[0].nbUsine
+
+    def updateFlotte(self):
+        for i in range(11):
+            for faction in self.listeFaction:
+                for etoile in faction.listeEtoiles:
+                    if(i == 0)
+                        etoile.ajouterVaisseau()
+                    for flotte in etoile.listeFlotte:
+                        if(i==0):
+                            if(flotte.destination != None and not flotte.travelTime > 0 ): #Verif si il y a une destination, et si le temps de voyage n'est pas deja calculer
+                                flotte.calcTravelTime()
+                                flotte.isMoving = True
+                        if(flotte.isMoving):
+                            flotte.updateTravelTime()
+                            if(travelTime == 0):
+                                flotte.isMoving=False
+                                if(isinstance(flotte.owner.parent,flotte.destination.parent)):#si c'est la meme faction
+                                    flotte.destination.listeFlotte[0].nbVaisseaux += flotte.nbVaisseaux
+                                else:
+                                    flotte.bataille()
 
 
 
@@ -158,3 +178,40 @@ class Flotte:
     
     def setDestination(self,etoile):
         self.destination = etoile
+
+    def bataille(self):
+        nbVaisseauDefence = self.destination.listeFlotte[0].nbVaisseaux
+        tourDefence = True
+        if(nbVaisseauDefence > self.nbVaisseaux)
+            if(attaqueSurprise(nbVaisseauDefence)):
+                tourDefence = False
+
+        
+        while(nbVaisseauDefence != 0 or self.nbVaisseaux != 0):
+            if(random.randint(0,10) > 6):
+                turnValue = -1
+            else:
+                turnValue = 0
+            if(tourDefence):
+                self.nbVaisseaux += turnValue
+                tourDefence = False
+            else:
+                nbVaisseauDefence += turnValue
+
+
+
+    def attaqueSurprise(self,nbVaisseauDefence):
+        ratio = nbVaisseauDefence/self.nbVaisseaux
+        if(ratio < 5): 
+            P = ratio / 10
+        elif(ratio < 20):
+            P = (3 * ratio + 35) /100
+        else:
+            P = 0.95
+
+        if(random.randint(0,100) < P*100):
+            return True
+        else:
+            return False
+
+
