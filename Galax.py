@@ -1,3 +1,5 @@
+# !!!CE FICHIER NE DEVRAIS PLUS ETRE UTILISER!!!
+
 from tkinter import *
 import random
 import math
@@ -35,7 +37,7 @@ class Flotte:
     def updateTravelTime(self):
         travelTime -= 0.1
     
-    def setDestination(etoile):
+    def setDestination(self,etoile):
         self.destination = etoile
 
 class Faction:
@@ -53,19 +55,19 @@ class Czin(Faction):
     def __init__(self):
         Faction.__init__(self)
         self.nom = 'Czin'
-        self.etoiles.append(Etoile(20,30,"Cygnus X-1","Czin"))
+        self.etoiles.append(Etoile(20,30,"Cygnus X-1",self))
         self.etoiles[0].nbUsine = 10
-        self.flottes.append(Flotte(self.nom,100))
-        self.flottes[0].positionCourante = self.etoiles[0]
                 
 class Gubru(Faction):
     def __init__(self):
         Faction.__init__(self)
         self.nom = 'Gubru'
-        self.etoiles.append(Etoile(20,30,"Granatovaya","Gubru"))
+        self.etoiles.append(Etoile(20,30,"Granatovaya",self))
         self.etoiles[0].nbUsine = 10
-        self.flottes.append(Flotte("Gubru",100))
-        self.flottes[0].positionCourante = self.etoiles[0]
+
+class Neutral(Faction):
+    def __init__(self):
+        self.nom = 'Neutral'
 
 class Jeu:
     def __init__(self,parent):
@@ -224,16 +226,16 @@ class Controlleur:
         self.vue=Vue(self.jeu.etoiles)
         self.vue.root.mainloop()
 		
-	def gameLoop():
+    def gameLoop(self):
         for i in range(self.tic):
             for faction in jeu.listeFaction:
                 for etoile in faction.listeEtoiles:
                     for flotte in etoile.listeFlotte:
                         if(i==0):
-                            if(flotte.destination != None):
-                                calcTravelTime()
+                            if(flotte.destination != None and not flotte.travelTime > 0 ): #Verif si il y a une destination, et si le temps de voyage n'est pas deja calculer
+                                flotte.calcTravelTime()
                         if(flotte.isMoving):
-                            updateTravelTime()
+                            flotte.updateTravelTime()
                         if(travelTime == 0):
                             flotte.isMoving=False
         
