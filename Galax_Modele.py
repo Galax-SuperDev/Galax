@@ -108,7 +108,7 @@ class Etoile:
 
 #CALIS QU'IL Y A DU COMMENTAIRE DANS LA PROCHAINE FONCTION!!!
     def setPosition(self):  #attribut une position au hasare a l'etoile en verifiant de ne pas la mettre sur une etoile existante
-        while(True)         #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au return
+        while(True):        #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au return
             posX = random.randint(0,100)
             posY = random.randint(0,100)  
             for faction in self.owner.parent.listeFaction:          #pour chaque faction dans la liste de faction
@@ -122,7 +122,7 @@ class Etoile:
                 self.posX = posX    #attribution de la position en x
                 self.posY = posY    #attribution de la position en y
                 print(str(posX)+' '+str(posY))#print la position de l'etoile
-                retourne            #quitte la fonction
+                return              #quitte la fonction
 
 
 
