@@ -5,43 +5,20 @@ import math
 
 #######################################################
 class Jeu:
-    def __init__(self,parent):
-        self.parent = parent
-        self.humain = Humain()
-        self.czin = Czin()
-        self.gubru = Gubru()
-        self.etoiles = self.creeEtoiles(8)
+    def __init__(self):
+        nbEtoileNeutre = 10 #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
+        self.listeFaction = []
+        self.listeFaction.append(Humain(self))
+        self.listeFaction.append(Czin(self))
+        self.listeFaction.append(Gubru(self))
+        self.listeFaction.append(Neutral(nbEtoileNeutre,self))
        
-    def creeEtoiles(self,nbEtoiles):
-        etoilesTemp = []
-        for i in range(0,nbEtoiles):
-            posX = random.randint(0,100)
-            posY = random.randint(0,100)
-            posValide = False
-            while posValide == False:    
-                # si la position de l'etoile est egale a la position d'une etoile mere
-                if( posX==self.humain.etoiles[0].posX and posY==self.humain.etoiles[0].posY):
-                    posValide = False
-                elif( posX==self.gubru.etoiles[0].posX and posY==self.gubru.etoiles[0].posY):
-                    posValide = False
-                elif( posX==self.czin.etoiles[0].posX and posY==self.czin.etoiles[0].posY):
-                    posValide = False
-                else:
-                    posValide = True
-                    
-                # si la position de l'etoile est egale a la position d'une autre etoile   
-                for e in etoilesTemp:
-                    if(posX == e.posX and posY == e.posY):
-                        posValide = False
-                    else:
-                        posValide = True
-                # si la position n'est pas valide on donne une nouvelle position a l'etoile et on recommence la boucle
-                if(posValide == False):
-                    posX = random.randint(0,100)
-                    posY = random.randint(0,100)
-            etoilesTemp.append(Etoile(posX,posY,"Zimbaboo","Neutral"))
-            print(str(posX)+' '+str(posY))
-        return etoilesTemp
+    def getMergedListeEtoile(self):
+        grosseListeEtoile = []
+        for faction in self.listeFaction:
+                for etoile in faction.listeEtoile:
+                    grosseListeEtoile.append(etoile)
+        return grosseListeEtoile
     
     def AjoutVaisseau(self):
         # ajout dans toutes les etoiles sauf etoiles mere
@@ -54,56 +31,108 @@ class Jeu:
 
 
 
+
+
+
+
 #######################################################
 class Faction:
-    def __init__(self):
-        self.etoiles=[]
+    def __init__(self,parent):
+        self.listeEtoile=[]
+        self.parent = parent
 
 class Humain(Faction):
-    def __init__(self):
-        Faction.__init__(self)
+    def __init__(self, parent):
+        Faction.__init__(self, parent)
         self.nom = 'Humain'
-        self.etoiles.append(Etoile(10,10,"Ohm",self))
-        self.etoiles[0].nbUsine = 10
+        self.listeEtoile.append(Etoile("Ohm",self))
+        self.listeEtoile[0].nbUsine = 10
         
 class Czin(Faction):
-    def __init__(self):
-        Faction.__init__(self)
+    def __init__(self, parent):
+        Faction.__init__(self, parent)
         self.nom = 'Czin'
-        self.etoiles.append(Etoile(20,30,"Cygnus X-1",self))
-        self.etoiles[0].nbUsine = 10
+        self.listeEtoile.append(Etoile("Cygnus X-1",self))
+        self.listeEtoile[0].nbUsine = 10
                 
 class Gubru(Faction):
-    def __init__(self):
-        Faction.__init__(self)
+    def __init__(self, parent):
+        Faction.__init__(self, parent)
         self.nom = 'Gubru'
-        self.etoiles.append(Etoile(20,30,"Granatovaya",self))
-        self.etoiles[0].nbUsine = 10
+        self.listeEtoile.append(Etoile("Granatovaya",self))
+        self.listeEtoile[0].nbUsine = 10
 
 class Neutral(Faction):
-    def __init__(self):
+    def __init__(self, nbEtoileNeutre, parent):
+        Faction.__init__(self, parent)
+        self.nbEtoileNeutre = nbEtoileNeutre
         self.nom = 'Neutral'
-        self.setListEtoile()
+        self.listeEtoile = []
+        self.setListeEtoileNeutre()
 
-    def setListEtoile(self):
+    def setListeEtoileNeutre(self):
+        for i in range(self.nbEtoileNeutre):
+            self.listeEtoile.append(Etoile(("Neutral "+str(i)), self))
+            
+
+
+
+
+
+
 
 
 #######################################################
 class Etoile:
-    def __init__(self,posX,posY,nom,owner):
-        self.posX = posX
-        self.posY = posY
+    def __init__(self,nom,owner):
+        self.owner = owner
+        self.posX = None
+        self.posY = None
+        self.setPosition()#afin d'attribuer une valeur a posX et posY
         self.nom = nom
-        self.nbUsine = random.randint(0,6)
+        self.nbUsine = 0
         self.listeFlotte = []
         self.spyRank = 0
-        self.owner = owner
         if(not isinstance(owner, Neutral)):# lorsque le proprio de l'etoile n'est pas un neutral
             self.listeFlotte.append(Flotte(self,100))
-        else:
+            self.nbUsine = 10
+            print(self.owner.nom)
+        else:#cas neutral
+            self.listeFlotte.append(Flotte(self,0))
+            self.nbUsine = random.randint(0,6)
+            print(self.nom)
     
-    def AjoutVaisseau(self): 
+    def ajoutVaisseau(self): 
         self.flotte.nbVaisseaux += self.nbUsine
+
+
+#CALIS QU'IL Y A DU COMMENTAIRE DANS LA PROCHAINE FONCTION!!!
+    def setPosition(self):  #attribut une position au hasare a l'etoile en verifiant de ne pas la mettre sur une etoile existante
+        while(True)         #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au return
+            posX = random.randint(0,100)
+            posY = random.randint(0,100)  
+            for faction in self.owner.parent.listeFaction:          #pour chaque faction dans la liste de faction
+                for etoile in faction.listeEtoile:                  #pour chaque etoile dans la liste d'etoile contenue dans chaque faction
+                    if( posX==etoile.posX and posY==etoile.posY):   #si la position de l'etoile courante est egale a la position d'une autre etoile
+                        break       #fait sortir du 2e "for", qui nous ammene au second break
+                else:               #si la 2e boucle finis sans heurt
+                    continue        #retourne et continue l'iteration dans le 1er "for"
+                break               #fait sortir du 1er "for", qui nous ammène au "while" au dessus
+            else:                   #si les deux boucles ont finis sans rencontrer une seule fois une etoile a la meme position que l'etoile courante
+                self.posX = posX    #attribution de la position en x
+                self.posY = posY    #attribution de la position en y
+                print(str(posX)+' '+str(posY))#print la position de l'etoile
+                retourne            #quitte la fonction
+
+
+
+
+
+
+
+
+
+
         
 
 
@@ -129,4 +158,3 @@ class Flotte:
     
     def setDestination(self,etoile):
         self.destination = etoile
-        
