@@ -22,7 +22,8 @@ class Controlleur:
 
 		
     def gameLoop(self):
-        self.jeu.updateFlotte()
+        for i in range(10):
+            self.jeu.updateFlotte()
         
 if __name__ == '__main__':
     c=Controlleur()

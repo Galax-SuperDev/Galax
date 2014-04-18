@@ -6,7 +6,8 @@ import math
 #######################################################
 class Jeu:
     def __init__(self):
-        nbEtoileNeutre = 10 #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
+        nbEtoileNeutre = 50 #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
+        print("Le nombre d'etoile est set a la 9eme ligne du modele a " + str(nbEtoileNeutre))
         self.listeFaction = []
         self.listeFaction.append(Humain(self))
         self.listeFaction.append(Czin(self))
@@ -30,24 +31,21 @@ class Jeu:
         self.humain.flottes[0].nbVaisseaux += self.humain.etoiles[0].nbUsine
 
     def updateFlotte(self):
-        for i in range(11):
-            for faction in self.listeFaction:
-                for etoile in faction.listeEtoiles:
-                    if(i == 0)
-                        etoile.ajouterVaisseau()
-                    for flotte in etoile.listeFlotte:
-                        if(i==0):
-                            if(flotte.destination != None and not flotte.travelTime > 0 ): #Verif si il y a une destination, et si le temps de voyage n'est pas deja calculer
-                                flotte.calcTravelTime()
-                                flotte.isMoving = True
-                        if(flotte.isMoving):
-                            flotte.updateTravelTime()
-                            if(travelTime == 0):
-                                flotte.isMoving=False
-                                if(isinstance(flotte.owner.parent,flotte.destination.parent)):#si c'est la meme faction
-                                    flotte.destination.listeFlotte[0].nbVaisseaux += flotte.nbVaisseaux
-                                else:
-                                    flotte.bataille()
+        for faction in self.listeFaction:
+            for flotte in faction.listeFlotteEnMouvement:
+                if(flotte.estRendu()):
+                    flotte.isMoving=False
+                    if(isinstance(flotte.owner,flotte.destination)):#si c'est la meme faction
+                        flotte.destination.mergeFlotte(flotte)
+                    else:
+                        flotte.bataille()
+                else:
+                    flotte.updateTravelTime()
+
+    def initialiserValeurGrappe():
+        for faction in self.listeFaction:
+            for etoile in faction.listeEtoile:
+                etoile.valeurGrappe = 0
 
 
 
@@ -58,41 +56,72 @@ class Jeu:
 #######################################################
 class Faction:
     def __init__(self,parent):
-        self.listeEtoile=[]
+        self.listeEtoile = []
+        self.listeFlotteEnMouvement = []
         self.parent = parent
 
 class Humain(Faction):
     def __init__(self, parent):
         Faction.__init__(self, parent)
         self.nom = 'Humain'
-        self.listeEtoile.append(Etoile("Ohm",self))
+        self.listeEtoile.append(Etoile("Soleil",self))
         self.listeEtoile[0].nbUsine = 10
+
+    def isDead():
+        if(self.listeEtoile.size() == 0 and self.listeFlotteEnMouvement == 0):
+            return True
         
 class Czin(Faction):
     def __init__(self, parent):
         Faction.__init__(self, parent)
         self.nom = 'Czin'
-        self.listeEtoile.append(Etoile("Cygnus X-1",self))
+        self.listeEtoile.append(Etoile("Etoile Czin",self))
+        self.etoileCourante = self.listeEtoile[0]
         self.listeEtoile[0].nbUsine = 10
+        self.listeEtoile[0].flotteStationnaire = Flotte(self,100)
+        self.distanceGrappe = 4
+
+    def formationFlotte():
+        pass
+    def determinerGrappe():
+        self.parent.initialiserValeurGrappe()
+        for faction in self.listeFaction:
+            for A in faction.listeEtoile:
+                for faction in self.listeFaction:
+                    for B in faction.listeEtoile:
+                        distance = getDistance(A,B)
+                        if(distance <= self.distanceGrappe):
+                            s = self.distanceGrappe - distance + 1
+                            A.valeurGrappe = s*s
+
+    def getDistance(self,A,B):
+        return math.sqrt((B.posX-A.posX)**2+(B.posY-A.posY)**2)
+
+
+
                 
 class Gubru(Faction):
     def __init__(self, parent):
         Faction.__init__(self, parent)
         self.nom = 'Gubru'
-        self.listeEtoile.append(Etoile("Granatovaya",self))
+        self.listeEtoile.append(Etoile("Etoile Gubru",self))
         self.listeEtoile[0].nbUsine = 10
+        self.listeEtoile[0].flotteStationnaire = Flotte(self,100)
+
+    def formationFlotte():
+        pass    
 
 class Neutral(Faction):
     def __init__(self, nbEtoileNeutre, parent):
         Faction.__init__(self, parent)
         self.nbEtoileNeutre = nbEtoileNeutre
         self.nom = 'Neutral'
-        self.listeEtoile = []
-        self.setListeEtoileNeutre()
+        self.setupListes()
 
-    def setListeEtoileNeutre(self):
+    def setupListes(self):
         for i in range(self.nbEtoileNeutre):
             self.listeEtoile.append(Etoile(("Neutral "+str(i)), self))
+
             
 
 
@@ -110,23 +139,39 @@ class Etoile:
         self.posY = None
         self.setPosition()#afin d'attribuer une valeur a posX et posY
         self.nom = nom
-        self.nbUsine = 0
-        self.listeFlotte = []
+        self.flotteStationnaire = Flotte(self,0)
+        self.flotteAuDernierPassage = -1
         self.spyRank = 0
-        if(not isinstance(owner, Neutral)):# lorsque le proprio de l'etoile n'est pas un neutral
-            self.listeFlotte.append(Flotte(self,100))
-            self.nbUsine = 10
-            print(self.owner.nom)
-        else:#cas neutral
-            self.listeFlotte.append(Flotte(self,0))
-            self.nbUsine = random.randint(0,6)
-            print(self.nom)
+        self.nbUsine = random.randint(0,6)
+        self.valeurGrappe = 0
+        print(self.nom,end=' -> ')
+        print(str(self.posX)+' '+str(self.posY))#print la position de l'etoile
     
     def ajoutVaisseau(self): 
-        self.flotte.nbVaisseaux += self.nbUsine
+        self.flotteStationnaire.nbVaisseaux += self.nbUsine
+
+    def updateSpyRank(self):
+        if(self.spyRank < 3):
+            self.spyRank += 1
+        self.flotteAuDernierPassage = self.flotteStationnaire.nbVaisseaux
 
 
-#CALIS QU'IL Y A DU COMMENTAIRE DANS LA PROCHAINE FONCTION!!!
+    def getNbVaisseau(self):
+        if(self.spyRank == 0 or self.spyRank == 1 or self.spyRank == 2):
+            return self.flotteAuDernierPassage
+        elif(isinstance(owner,Humain) or self.spyRank == 3):
+            return self.flotteStationnaire.nbVaisseaux
+
+    def getNbUsine(self):
+        if(self.spyRank == 0 or self.spyRank == 1):
+            return -1       #afin de pouvoir donner la liberter de choisir le message aproprié à afficher
+        elif(self.spyRank == 2 or self.spyRank == 3 or isinstance(owner,Humain)):
+            return self.nbUsine
+
+    def gotTakenBy(self,newOwner):
+        self.owner = newOwner
+        self.flotteAuDernierPassage = 0
+
     def setPosition(self):  #attribut une position au hasare a l'etoile en verifiant de ne pas la mettre sur une etoile existante
         while(True):        #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au return
             posX = random.randint(0,100)
@@ -141,7 +186,6 @@ class Etoile:
             else:                   #si les deux boucles ont finis sans rencontrer une seule fois une etoile a la meme position que l'etoile courante
                 self.posX = posX    #attribution de la position en x
                 self.posY = posY    #attribution de la position en y
-                print(str(posX)+' '+str(posY))#print la position de l'etoile
                 return              #quitte la fonction
 
 
@@ -151,11 +195,6 @@ class Etoile:
 
 
 
-
-
-        
-
-
 #######################################################
 class Flotte:
     def __init__(self,owner,nbVaisseaux):
@@ -163,7 +202,9 @@ class Flotte:
         self.nbVaisseaux = nbVaisseaux
         self.travelTime = 0
         self.destination = None
-        self.isMoving = False
+
+    def mergeFlotte(laFlotteAnnexe):
+        self.nbVaisseaux += laFlotteAnnexe.nbVaisseaux
 
     def calcTravelTime(self):
         distance = abs((self.destination.posX - self.owner.posX)+
@@ -172,6 +213,12 @@ class Flotte:
             self.travelTime = distance/2
         else:
             self.travelTime = 1+((distance-2)/3)
+
+    def estRendu(self):
+        if(self.travelTime == 0):
+            return True
+        else:
+            return False
     
     def updateTravelTime(self):
         travelTime -= 0.1
@@ -182,21 +229,29 @@ class Flotte:
     def bataille(self):
         nbVaisseauDefence = self.destination.listeFlotte[0].nbVaisseaux
         tourDefence = True
-        if(nbVaisseauDefence > self.nbVaisseaux)
+        if(nbVaisseauDefence > self.nbVaisseaux):
+            print("Possibilité d'attaque surprise...")
             if(attaqueSurprise(nbVaisseauDefence)):
                 tourDefence = False
-
-        
+                print("Ahaha! Attaque surprise!!!")        
         while(nbVaisseauDefence != 0 or self.nbVaisseaux != 0):
             if(random.randint(0,10) > 6):
                 turnValue = -1
+                print("Perte d'un vaisseau pour les",end=' ')
             else:
                 turnValue = 0
             if(tourDefence):
                 self.nbVaisseaux += turnValue
                 tourDefence = False
+                print("attaquant")
             else:
                 nbVaisseauDefence += turnValue
+                print("defenseur")
+        else:
+            if(nbVaisseauDefence == 0):
+                return self.owner
+            else:
+                return self.destination.owner
 
 
 
