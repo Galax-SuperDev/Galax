@@ -119,23 +119,27 @@ class Gubru(Faction):
     		self.force_attaque = force_attaque_basique * 2
     	
     	while(self.listeEtoile[0].nbVaisseaux >= force_attaque+force_attaque_basique ):
-    		self.listeEtoile[0].nouvelleFlotte = Flotte(self,force_attaque)
+    		self.listeEtoile[0].listeFlotteAEnvoyer.append(Flotte(self,force_attaque))
+        
+        for flotte in self.listeEtoile[0].listeFlotteAEnvoyer: 
+            flotte.setDestination(self,trouverEtoilePlusPres(self,self.listeEtoile[0]))
+
     		
     def trouverEtoilePlusPres(self,etoileDeBase):
     	self.etoilePlusPres = None
         self.distance = 0
         self.distancePlusPres = 0
 
-
         for faction in self.listeFaction: #pour chaque faction
             if (faction.nom != "Gubru"): # qui ne sont pas Gubru
                 for etoile in faction.listeEtoile: # on regarde a travers toutes les etoiles
                    distance = abs((etoile.posX - self.listeEtoile[0].posX)+ (etoile.posY - self.listeEtoile[0].posY)) #on etabli la distance
-                   if(distance <= distancePlusPres): # on regarde si la distance est plus petite que la plus petite distance trouver a date
+                   if(distance <= distancePlusPres and etoile.choisiPourAttaque == False): # on regarde si la distance est plus petite que la plus petite distance trouver a date et si elle a deja ete choisi
                         self.etoilePlusPres = etoile # on a trouver l'etoile la plus pres
+                        etoile.choisiPourAttaque = True
 
         return self.etoilePlusPres
-
+    #reste a gerer les flottes qui viennent de conquerir une etoile et s'assurer que quand on arrive a destination etoile.choisiPourAttaque = False
 
     	
     		
@@ -174,6 +178,8 @@ class Etoile:
         self.spyRank = 0
         self.nbUsine = random.randint(0,6)
         self.valeurGrappe = 0
+        self.listeFlotteAEnvoyer = [] # pour construire les flottes a envoyer en mission d'attaque. comme cela on peut facilement iterer dans une liste de flotte qui DOIT attaquer
+        self.choisiPourAttaque = False # sert a determiner si une etoile est deja choisi pour etre attaquer par une flotte, ainsi une flotte de la meme faction n'y enverra pas de flotte
         print(self.nom,end=' -> ')
         print(str(self.posX)+' '+str(self.posY))#print la position de l'etoile
     
