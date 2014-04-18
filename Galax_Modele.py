@@ -5,6 +5,7 @@ import math
 
 #######################################################
 class Jeu:
+	#on doit ajouter une valeur du temps qui passe a utiliser dans la creation de flottes des AI
     def __init__(self):
         nbEtoileNeutre = 50 #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
         print("Le nombre d'etoile est set a la 9eme ligne du modele a " + str(nbEtoileNeutre))
@@ -13,6 +14,7 @@ class Jeu:
         self.listeFaction.append(Czin(self))
         self.listeFaction.append(Gubru(self))
         self.listeFaction.append(Neutral(nbEtoileNeutre,self))
+        self.anneePassees = 0
        
     def getMergedListeEtoile(self):
         grosseListeEtoile = []
@@ -107,9 +109,23 @@ class Gubru(Faction):
         self.listeEtoile.append(Etoile("Etoile Gubru",self))
         self.listeEtoile[0].nbUsine = 10
         self.listeEtoile[0].flotteStationnaire = Flotte(self,100)
+        self.nbr_vaisseau_par_attaque = 5
+        self.force_attaque_basique = 10
 
     def formationFlotte():
-        pass    
+    	if (Jeu.anneesPassees > 0):
+    		self.force_attaque = Jeu.anneesPassees * (self.nbr_vaisseau_par_attaque + self.force_attaque_basique)
+    	else:
+    		self.force_attaque = force_attaque_basique * 2
+    	
+    	while(self.listeEtoile[0].nbVaisseaux >= force_attaque+force_attaque_basique ):
+    		self.listeEtoile[0].nouvelleFlotte = Flotte(self,force_attaque)
+    		
+    def trouverEtoilePlusPres(self,etoileDeBase):
+    	pass
+    	
+    		
+        
 
 class Neutral(Faction):
     def __init__(self, nbEtoileNeutre, parent):
@@ -164,7 +180,7 @@ class Etoile:
 
     def getNbUsine(self):
         if(self.spyRank == 0 or self.spyRank == 1):
-            return -1       #afin de pouvoir donner la liberter de choisir le message aproprié à afficher
+            return -1       #afin de pouvoir donner la liberter de choisir le message aproprie a�afficher
         elif(self.spyRank == 2 or self.spyRank == 3 or isinstance(owner,Humain)):
             return self.nbUsine
 
@@ -205,6 +221,8 @@ class Flotte:
 
     def mergeFlotte(laFlotteAnnexe):
         self.nbVaisseaux += laFlotteAnnexe.nbVaisseaux
+		if(self.nbVaisseaux - laFlotteAnnexe.nbVaisseaux >= 0 ) # il y a un if puisqu'il se peut que la flotte annexe arrive sur une etoile sans flotte donc il ne faut pas supprimer laFlotteAnnexe
+			del laFlotteAnnexe # on delete la flotte annexe puisque elle donne tout ses vaisseaux a la flotte sur l'etoile
 
     def calcTravelTime(self):
         distance = abs((self.destination.posX - self.owner.posX)+

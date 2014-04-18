@@ -24,6 +24,6 @@ class Controlleur:
     def gameLoop(self):
         for i in range(10):
             self.jeu.updateFlotte()
-        
+        self.jeu.anneePassees +=1
 if __name__ == '__main__':
     c=Controlleur()
