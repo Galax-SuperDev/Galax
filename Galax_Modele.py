@@ -122,7 +122,21 @@ class Gubru(Faction):
     		self.listeEtoile[0].nouvelleFlotte = Flotte(self,force_attaque)
     		
     def trouverEtoilePlusPres(self,etoileDeBase):
-    	pass
+    	self.etoilePlusPres = None
+        self.distance = 0
+        self.distancePlusPres = 0
+
+
+        for faction in self.listeFaction: #pour chaque faction
+            if (faction.nom != "Gubru"): # qui ne sont pas Gubru
+                for etoile in faction.listeEtoile: # on regarde a travers toutes les etoiles
+                   distance = abs((etoile.posX - self.listeEtoile[0].posX)+ (etoile.posY - self.listeEtoile[0].posY)) #on etabli la distance
+                   if(distance <= distancePlusPres): # on regarde si la distance est plus petite que la plus petite distance trouver a date
+                        self.etoilePlusPres = etoile # on a trouver l'etoile la plus pres
+
+        return self.etoilePlusPres
+
+
     	
     		
         
