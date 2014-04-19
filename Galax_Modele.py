@@ -32,7 +32,7 @@ class Jeu:
         self.gubru.flottes[0].nbVaisseaux += self.gubru.etoiles[0].nbUsine
         self.humain.flottes[0].nbVaisseaux += self.humain.etoiles[0].nbUsine
 
-    def update(self):
+    def moveFlotteEnMouvement(self):
         aSupprimer = []
         for faction in self.listeFaction:
             for flotte in faction.listeFlotteEnMouvement:
