@@ -10,9 +10,9 @@ class Jeu:
         nbEtoileNeutre = 50 #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
         print("Le nombre d'etoile est set a la 9eme ligne du modele a " + str(nbEtoileNeutre))
         self.listeFaction = []
-        self.listeFaction.append(Humain(self))
-        self.listeFaction.append(Czin(self))
         self.listeFaction.append(Gubru(self))
+        self.listeFaction.append(Czin(self))
+        self.listeFaction.append(Humain(self))
         self.listeFaction.append(Neutral(nbEtoileNeutre,self))
         self.anneePassees = 0
        
@@ -97,13 +97,59 @@ class Czin(Faction):
         Faction.__init__(self, parent)
         self.nom = 'Czin'
         self.listeEtoile.append(Etoile("Etoile Czin",self))
-        self.etoileCourante = self.listeEtoile[0]
         self.listeEtoile[0].nbUsine = 10
         self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None)
+        self.etoileMere = self.listeEtoile[0]
+        self.etoileBase = self.listeEtoile[0]
+
         self.distanceGrappe = 4
+        self.distance_rassemblement = 6
+        self.force_attaque_basique = 20
+        self.nbr_vaisseaux_par_attaque = 4
+
+        self.mode_rassemblement_forces = 0
+        self.mode_etablir_base = 1
+        self.mode_conquerir_grappe = 2
+        self.mode = self.mode_rassemblement_forces
+
 
     def formationFlotte():
         pass
+
+    def getForceAttaque():
+        return self.parent.anneePassees * self.nbr_vaisseaux_par_attaque * self.force_attaque_basique
+
+    def choixMode(etoile):
+        if(self.mode == self.mode_rassemblement_forces):
+            if(3*self.getForceAttaque() <= etoile.flotteStationnaire):
+                self.mode = self.mode_etablir_base
+                self.etoileBase = self.choisirBase()
+        elif(self.mode == self.mode_etablir_base):
+            pass
+        elif(self.mode == self.mode_conquerir_grappe):
+            pass
+
+    def rassemblementForces():
+        for etoile in listeEtoile:
+            if(self.getDistance(etoile,self.etoileBase))
+            self.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.etoileBase)
+
+    def choisirBase():
+        etoileRetour = None
+        for etoile in listeEtoile:
+            if(etoileRetour = None):
+                etoileRetour = etoile
+            if(etoile.valeurGrappe = 0):
+                etoile.valeurBase = 0
+            else:
+                etoile.valeurBase = etoile.valeurGrappe-3*self.getDistance(self.etoileBase,etoile)
+                if(etoile.valeurBase > etoileRetour.valeurBase):
+                    etoileRetour = etoile
+        return etoileRetour
+
+    def conquerirGrappe():
+        pass
+
 
     def initialiserValeurGrappe():
         for faction in self.parent.listeFaction:
@@ -111,7 +157,7 @@ class Czin(Faction):
                 etoile.valeurGrappe = 0
 
     def determinerGrappe():
-        self.parent.initialiserValeurGrappe()
+        self.initialiserValeurGrappe()
         for faction in self.listeFaction:
             for A in faction.listeEtoile:
                 for faction in self.listeFaction:
@@ -202,6 +248,7 @@ class Etoile:
         self.spyRank = 0
         self.nbUsine = random.randint(0,6)
         self.valeurGrappe = 0
+        self.valeurBase = 0
         #voir les explications dans le commit nomme "Changement majeur dans la gestion des platetes - ajout fn"
         #self.listeFlotteAEnvoyer = [] # pour construire les flottes a envoyer en mission d'attaque. comme cela on peut facilement iterer dans une liste de flotte qui DOIT attaquer
         #pour ce qui est de la prochaine ligne, je ne vois pas l'interet... mais si tu crois que c'est un feature important, on peut le garder
@@ -267,7 +314,6 @@ class Flotte:
 
     def mergeFlotte(laFlotteAnnexe):
         self.nbVaisseaux += laFlotteAnnexe.nbVaisseaux
-#desoler, ce qui etait ici est gerer dans Jeu.update
 
     def calcTravelTime(self):
         distance = abs((self.destination.posX - self.owner.posX)+
@@ -309,6 +355,7 @@ class Flotte:
                 print("attaquant")
             else:
                 nbVaisseauDefence += turnValue
+                tourDefence = True
                 print("defenseur")
         else:
             if(nbVaisseauDefence == 0):
