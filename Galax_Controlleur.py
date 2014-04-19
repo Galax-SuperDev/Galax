@@ -7,7 +7,7 @@ class Controlleur:
         if(self.debugMod):
             self.jeu = Galax_Modele.Jeu()
         else:
-            self.jeu
+            self.jeu = None
         self.vue = Galax_Vue.Vue(self.jeu.getMergedListeEtoile())
         self.vue.root.mainloop()
 
@@ -23,7 +23,9 @@ class Controlleur:
 		
     def gameLoop(self):
         for i in range(10):
-            self.jeu.updateFlotte()
+            self.jeu.moveFlotteEnMouvement()
         self.jeu.anneePassees +=1
+
+
 if __name__ == '__main__':
     c=Controlleur()
