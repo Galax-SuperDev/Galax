@@ -190,10 +190,9 @@ class Gubru(Faction):
             self.force_attaque = force_attaque_basique * 2
 
         while(self.listeEtoile[0].nbVaisseaux >= force_attaque+force_attaque_basique ):
-            self.listeFlotteEnMouvement.append(Flotte(self,force_attaque))
+            self.parent.envoyerNouvelleFlotte(self.force_attaque,trouverEtoilePlusPres(self.listeEtoile[0]))
 ########voir les explications dans le commit nomme "Changement majeur dans la gestion des platetes - ajout fn"
-        for flotte in self.listeEtoile[0].listeFlotteAEnvoyer: 
-            flotte.setDestination(self,trouverEtoilePlusPres(self,self.listeEtoile[0]))
+            
 
     def trouverEtoilePlusPres(self,etoileDeBase):
         self.etoilePlusPres = None
@@ -204,14 +203,25 @@ class Gubru(Faction):
             if (faction.nom != "Gubru"): # qui ne sont pas Gubru
                 for etoile in faction.listeEtoile: # on regarde a travers toutes les etoiles
                    distance = abs((etoile.posX - self.listeEtoile[0].posX)+ (etoile.posY - self.listeEtoile[0].posY)) #on etabli la distance
-                   if(distance <= distancePlusPres and etoile.choisiPourAttaque == False): # on regarde si la distance est plus petite que la plus petite distance trouver a date et si elle a deja ete choisi
+                   if(distance <= distancePlusPres and self.listeEtoile[0].listeFlotteEnMouvement.destination != etoile): # regarde la plus proche qui n'est PAS deja une cible
                         self.etoilePlusPres = etoile # on a trouver l'etoile la plus pres
-                        etoile.choisiPourAttaque = True
+                    else:
+                        print("il n'y a plus de cibles potentielles")
 
         return self.etoilePlusPres
-    #reste a gerer les flottes qui viennent de conquerir une etoile et s'assurer que quand on arrive a destination etoile.choisiPourAttaque = False
 
-    	
+    def reorganisationDesFlottes(self): #cela doit etre fait a chaque tour
+        for etoile in self.listeEtoile:
+            if(etoile != self.listeEtoile[0]): # on ne veux pas envoyer de flottes de l'etoile mere vers l'etoile mere
+                if (etoile.flotteStationnaire > 25):
+                    self.parent.envoyerNouvelleFlotte(etoile.flotteStationnaire - 15,self.listeEtoile[0])
+                else:
+                    self.parent.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.listeEtoile[0])
+    
+    def changerEtoileMere(self):
+        # insert dans la liste a [0] et pop ou l'etoile etait avant dans la liste
+        # a voir ou faire cette fonction
+        pass
     		
         
 
@@ -222,9 +232,17 @@ class Neutral(Faction):
         self.nom = 'Neutral'
         self.setupListes()
 
+    def donnerNomEtoile(self):
+        #en cours de dev.
+        fileHandle = open('listeNomEtoile.txt',r)
+        nom = fileHandle.readLine()
+        fileHandle.close()
+
+
     def setupListes(self):
         for i in range(self.nbEtoileNeutre):
             self.listeEtoile.append(Etoile(("Neutral "+str(i)), self))
+
 
             
 
@@ -252,7 +270,7 @@ class Etoile:
         #voir les explications dans le commit nomme "Changement majeur dans la gestion des platetes - ajout fn"
         #self.listeFlotteAEnvoyer = [] # pour construire les flottes a envoyer en mission d'attaque. comme cela on peut facilement iterer dans une liste de flotte qui DOIT attaquer
         #pour ce qui est de la prochaine ligne, je ne vois pas l'interet... mais si tu crois que c'est un feature important, on peut le garder
-        self.choisiPourAttaque = False # sert a determiner si une etoile est deja choisi pour etre attaquer par une flotte, ainsi une flotte de la meme faction n'y enverra pas de flotte
+        # j'en avais de besoin dans une de mes fonctions mais je m'en suis debarrasser
         print(self.nom,end=' -> ')
         print(str(self.posX)+' '+str(self.posY))#print la position de l'etoile
     
