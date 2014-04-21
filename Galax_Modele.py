@@ -242,9 +242,24 @@ class Neutral(Faction):
     def donnerNomEtoile(self):
         #en cours de dev.
         fileHandle = open('listeNomEtoile.txt','r')
+        self.tabNom = []
         self.random_nom = random.choice(fileHandle.readlines())
         self.nomTrouver = False
-        # trouver comment bien prendre une etoile pas deja choisi
+        self.tabNom.append(fileHandle.readlines().rstrip())
+        while 1:
+            self.tabNom.append(fileHandle.readlines().rstrip())
+            if not fileHandle.readlines() : break
+        fileHandle.close()
+        nomRandom = random.choice(tabNom)
+        while (self.nomTrouver == False):
+            for etoile in self.listeEtoile:
+                if(nomRandom == etoile.nom):
+                    nomRandom = random.choice(tabNom)
+                    break
+                else:
+                    nomTrouver = True
+        return nomRandom
+        #en attente d'un controlleur qui fonctionne
         """while (self.nomTrouver == False):
             for etoile in self.listeEtoile:
                 if(etoile.nom == self.random_nom):
@@ -252,9 +267,8 @@ class Neutral(Faction):
                     break
                 else:
                     self.nomTrouver = True
-                    fileHandle.close()"""
         fileHandle.close()
-        return self.random_nom
+        return self.random_nom.rstrip()"""
 
 
 
