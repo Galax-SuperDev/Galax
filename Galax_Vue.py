@@ -5,7 +5,7 @@ class Vue:
     def __init__(self,controlleur):
         self.controlleur = controlleur
         self.factionVaincue=''
-        self.listeEtoile=[]
+        self.listeEtoiles=[]
         
         self.root=Tk()
         self.root.title('Galax')
@@ -45,13 +45,15 @@ class Vue:
         eventX = event.x
         eventY = event.y
         print ('x:'+str(eventX)+' y:'+str(eventY))
+        
         if(eventX >= self.buttonPosX and eventX <= self.buttonPosX+self.buttonWidth):
             if(eventY >= self.buttonPosY1 and eventY <= self.buttonPosY1+self.buttonHeight):
-                print("button1")
+                print("button1",end=' ')
+                self.controlleur.menuLoop(0)
             elif(eventY >= self.buttonPosY2 and eventY <= self.buttonPosY2+self.buttonHeight):
-                print("button2")
+                print("button2",end=' ')
             elif(eventY >= self.buttonPosY3 and eventY <= self.buttonPosY3+self.buttonHeight):
-                print("button3")
+                print("button3",end=' ')
         
     '''
     def resize(self,event):
@@ -72,21 +74,20 @@ class Vue:
         
     #la liste de toutes les etoiles de la partie
     def setListeEtoile(self,listeEtoile):
-        self.listeEtoile = listeEtoile
+        self.listeEtoiles = listeEtoile
         
     def drawJeu(self):
-        self.drawEtoiles(self.listeEtoile)
+        self.canvas.delete('all')
+        self.drawEtoiles()
         self.drawBottomMenu()
         self.drawSideMenu()
         
     def drawSideMenu(self):
-        self.canvas.delete("menuBar")
         self.canvas.create_rectangle(self.screenWidth-256,0,
                                      self.screenWidth,self.screenHeight-128,
                                      fill='gray',tags="menuBar")
         
     def drawBottomMenu(self):
-        self.canvas.delete("menuBar")
         self.canvas.create_rectangle(0,self.screenHeight-128,
                                      self.screenWidth,self.screenHeight,
                                      fill='gray',tags="menuBar")

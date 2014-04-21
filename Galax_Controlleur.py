@@ -10,14 +10,13 @@ class Controlleur:
     def menuLoop(self, vueReturnKey):
         if(vueReturnKey == 0):#NewGame
             self.jeu = Galax_Modele.Jeu()
-            vue.setListeEtoile(self.jeu.getMergedListeEtoile())
-            vue.drawJeu()
+            self.vue.setListeEtoile(self.jeu.getMergedListeEtoile())
+            self.vue.drawJeu()
         elif(vueReturnKey == 1):#High scores
             pass
         elif(vueReturnKey == 2):#Quitter"
             pass
 
-		
     def gameLoop(self):
         jeu.gestionTroupe()
         for i in range(10):
