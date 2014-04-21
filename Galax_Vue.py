@@ -52,13 +52,13 @@ class Vue:
         if(self.etatVue == 0):
             if(eventX >= self.buttonPosX and eventX <= self.buttonPosX+self.buttonWidth):
                 if(eventY >= self.buttonPosY1 and eventY <= self.buttonPosY1+self.buttonHeight):
-                    print("button1",end=' ')
+                    print("button1")
                     self.controlleur.menuLoop(0)
                     self.etatVue = 1
                 elif(eventY >= self.buttonPosY2 and eventY <= self.buttonPosY2+self.buttonHeight):
-                    print("button2",end=' ')
+                    print("button2")
                 elif(eventY >= self.buttonPosY3 and eventY <= self.buttonPosY3+self.buttonHeight):
-                    print("button3",end=' ')
+                    print("button3")
         else:
             print('game is running')
                 

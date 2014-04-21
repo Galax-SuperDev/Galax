@@ -168,16 +168,16 @@ class Czin(Faction):
         listeEtoileDejaEnvoi = []
 
         while(self.etoileDeBase.flotteStationnaire >= nbEnvoi):
-            for(etoile in listeDeTouteLesEtoile):
+            for etoile in listeDeTouteLesEtoile:
                 if(etoile != etoilePlusProche):
                     distance = self.getDistance(etoile,self.etoileBase)
                     distancePlusProche = self.getDistance(etoilePlusProche,self.etoileBase)
                     if(distance < distancePlusProche):
-                        if(distance != 0)
+                        if(distance != 0):
                             if(not listeEtoileDejaEnvoi):
                                 etoilePlusProche = etoile
                             else:
-                                for(etoileDejaEnvoi in listeEtoileDejaEnvoi):
+                                for etoileDejaEnvoi in listeEtoileDejaEnvoi:
                                     if(etoileDejaEnvoi == etoile):
                                         break
                                 else:
@@ -265,40 +265,18 @@ class Neutral(Faction):
         Faction.__init__(self, parent)
         self.nbEtoileNeutre = nbEtoileNeutre
         self.nom = 'Neutral'
+        self.tabNomPossible = []
         self.setupListes()
+        
 
     def donnerNomEtoile(self):
-        #en cours de dev.
         fileHandle = open('listeNomEtoile.txt','r')
-        self.tabNom = []
-        self.random_nom = random.choice(fileHandle.readlines())
-        self.nomTrouver = False
-        self.tabNom.append(fileHandle.readlines().rstrip())
-        while 1:
-            self.tabNom.append(fileHandle.readlines().rstrip())
-            if not fileHandle.readlines() : break
-        fileHandle.close()
-        nomRandom = random.choice(tabNom)
-        while (self.nomTrouver == False):
-            for etoile in self.listeEtoile:
-                if(nomRandom == etoile.nom):
-                    nomRandom = random.choice(tabNom)
-                    break
-                else:
-                    nomTrouver = True
-        return nomRandom
-        #en attente d'un controlleur qui fonctionne
-        """while (self.nomTrouver == False):
-            for etoile in self.listeEtoile:
-                if(etoile.nom == self.random_nom):
-                    self.random_nom = random.choice(open('listeNomEtoile.txt','r').readlines())
-                    break
-                else:
-                    self.nomTrouver = True
-        fileHandle.close()
-        return self.random_nom.rstrip()"""
-
-
+        if(not self.tabNomPossible):#si le fichier n'est pas encore parser...
+            for ligne in fileHandle.readlines():
+                self.tabNomPossible.append(str(ligne).rstrip())
+            else:
+                fileHandle.close()
+        return self.tabNomPossible.pop(random.randint(0,len(self.tabNomPossible)-1))
 
     def setupListes(self):
         for i in range(self.nbEtoileNeutre):
@@ -306,12 +284,6 @@ class Neutral(Faction):
 
 
             
-
-
-
-
-
-
 
 
 #######################################################

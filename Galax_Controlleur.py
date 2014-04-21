@@ -21,6 +21,7 @@ class Controlleur:
         jeu.gestionTroupe()
         for i in range(10):
             self.jeu.moveFlotteEnMouvement()
+        self.jeu.ajoutVaisseau()
         self.jeu.anneePassees +=1
         if(jeu.faction[0].isDead()):
             vue.drawFinPartie(False)
