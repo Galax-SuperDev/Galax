@@ -2,34 +2,66 @@ from tkinter import *
 import time
 
 class Vue:
-    def __init__(self,):
+    def __init__(self,controlleur):
+        self.controlleur = controlleur
         self.factionVaincue=''
-        self.listeEtoile=[]
+        self.listeEtoiles=[]
+        
+        self.etatVue = 0
         
         self.root=Tk()
         self.root.title('Galax')
         self.root.iconbitmap(default='galaxIcon.ico')
               
+        # taille de l'ecran--------------------------------------
         self.screenWidth = 1280
         self.screenHeight = 768
+        
+        # taille du canva----------------------------------------
         self.width = 1024
         self.height = 640
+        
+        # taille des bouttons du menus---------------------------
+        self.buttonWidth = 200
+        self.buttonHeight = 64
+        
+        self.buttonPosX = 0
+        self.buttonPosY1 = 0
+        self.buttonPosY2 = 0
+        self.buttonPosY3 = 0
+        #--------------------------------------------------------
         self.canvas=Canvas(self.root, width=self.screenWidth, height=self.screenHeight, bg='black')  
               
         #self.canvas.bind('<Configure>', self.resize)
         self.canvas.bind('<Button-1>', self.click)
     
-        #self.canvas.pack(expand=True, fill=BOTH)
+        self.canvas.pack()
     
         #image de background
         self.background = PhotoImage(file="cosmosBG.gif")
-        self.canvas.create_image(0,0,anchor=NW,image=self.background)
+        #self.canvas.create_image(0,0,anchor=NW,image=self.background)
         
+        self.drawMainMenu()
         
     def click(self,event):
         eventX = event.x
         eventY = event.y
+        print ('x:'+str(eventX)+' y:'+str(eventY))
         
+        # permet de savoir si la partie de jeu est debutee
+        if(self.etatVue == 0):
+            if(eventX >= self.buttonPosX and eventX <= self.buttonPosX+self.buttonWidth):
+                if(eventY >= self.buttonPosY1 and eventY <= self.buttonPosY1+self.buttonHeight):
+                    print("button1",end=' ')
+                    self.controlleur.menuLoop(0)
+                    self.etatVue = 1
+                elif(eventY >= self.buttonPosY2 and eventY <= self.buttonPosY2+self.buttonHeight):
+                    print("button2",end=' ')
+                elif(eventY >= self.buttonPosY3 and eventY <= self.buttonPosY3+self.buttonHeight):
+                    print("button3",end=' ')
+        else:
+            print('game is running')
+                
     '''
     def resize(self,event):
         self.screenWidth = event.width
@@ -49,21 +81,20 @@ class Vue:
         
     #la liste de toutes les etoiles de la partie
     def setListeEtoile(self,listeEtoile):
-        self.listeEtoile = listeEtoile
+        self.listeEtoiles = listeEtoile
         
     def drawJeu(self):
-        self.drawEtoiles(self.listeEtoile)
+        self.canvas.delete('all')
+        self.drawEtoiles()
         self.drawBottomMenu()
         self.drawSideMenu()
         
     def drawSideMenu(self):
-        self.canvas.delete("menuBar")
         self.canvas.create_rectangle(self.screenWidth-256,0,
                                      self.screenWidth,self.screenHeight-128,
                                      fill='gray',tags="menuBar")
         
     def drawBottomMenu(self):
-        self.canvas.delete("menuBar")
         self.canvas.create_rectangle(0,self.screenHeight-128,
                                      self.screenWidth,self.screenHeight,
                                      fill='gray',tags="menuBar")
@@ -88,33 +119,36 @@ class Vue:
         self.buttonWidth = 200
         self.buttonHeight = 64
         
-        buttonPosX = ((self.screenWidth/2)-self.buttonWidth/2)
-        buttonPosY = self.screenHeight/3
+        self.buttonPosX = (self.screenWidth/2)-self.buttonWidth/2
+        
+        self.buttonPosY1 = self.screenHeight/3 
+        self.buttonPosY2 = self.screenHeight/3 + self.buttonHeight + 2
+        self.buttonPosY3 = self.screenHeight/3 + (self.buttonHeight*2) + 4
         
         self.canvas.delete("menu")
         
-        self.canvas.create_rectangle(buttonPosX, buttonPosY,
-                                     buttonPosX+self.buttonWidth, buttonPosY+self.buttonHeight, 
+        self.canvas.create_rectangle(self.buttonPosX, self.buttonPosY1,
+                                     self.buttonPosX+self.buttonWidth, self.buttonPosY1+self.buttonHeight, 
                                      fill='gray', activefill='white', tags='menu')
         
-        self.canvas.create_rectangle(buttonPosX, buttonPosY+self.buttonHeight+2,
-                                     buttonPosX+self.buttonWidth, buttonPosY+(self.buttonHeight*2)+2, 
+        self.canvas.create_rectangle(self.buttonPosX, self.buttonPosY2,
+                                     self.buttonPosX+self.buttonWidth, self.buttonPosY1+(self.buttonHeight*2)+2, 
                                      fill='gray', activefill='white', tags='menu')
         
-        self.canvas.create_rectangle(buttonPosX,buttonPosY+(self.buttonHeight*2)+4,
-                                     buttonPosX+self.buttonWidth,buttonPosY+(self.buttonHeight*3)+4,
+        self.canvas.create_rectangle(self.buttonPosX, self.buttonPosY3,
+                                     self.buttonPosX+self.buttonWidth, self.buttonPosY1+(self.buttonHeight*3)+4,
                                      fill='gray',activefill='white',tags='menu')
         
-        self.canvas.create_text(buttonPosX+100,buttonPosY+32,
+        self.canvas.create_text(self.buttonPosX+100,self.buttonPosY1+32,
                                 text='New game',fill='black',activefill='white',
                                 font=('consolas','16'),
                                 tags='menu')
-        self.canvas.create_text(buttonPosX+100,buttonPosY+96,
+        self.canvas.create_text(self.buttonPosX+100,self.buttonPosY1+96,
                                 text='High scores',
                                 fill='black',activefill='white',
                                 font=('consolas','16'),
                                 tags='menu')
-        self.canvas.create_text(buttonPosX+100,buttonPosY+160,
+        self.canvas.create_text(self.buttonPosX+100,self.buttonPosY1+160,
                                 text='Quit game',
                                 fill='black',activefill='white',
                                 font=('consolas','16'),
