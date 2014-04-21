@@ -244,13 +244,16 @@ class Neutral(Faction):
         fileHandle = open('listeNomEtoile.txt','r')
         self.tabNom = []
         self.random_nom = random.choice(fileHandle.readlines())
+        self.random_nom = self.random_nom.rstrip()
         self.nomTrouver = False
-        self.tabNom.append(fileHandle.readlines().rstrip())
+        self.tabNom.append(self.random_nom)
         while 1:
-            self.tabNom.append(fileHandle.readlines().rstrip())
-            if not fileHandle.readlines() : break
+            self.random_nom = random.choice(fileHandle.readlines())
+            self.random_nom = self.random_nom.rstrip()
+            self.tabNom.append(random_nom)
+            if not random_nom : break
         fileHandle.close()
-        nomRandom = random.choice(tabNom)
+        nomRandom = random.choice(self.tabNom)
         while (self.nomTrouver == False):
             for etoile in self.listeEtoile:
                 if(nomRandom == etoile.nom):
