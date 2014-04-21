@@ -14,7 +14,7 @@ class Controlleur:
             vue.drawJeu()
         elif(vueReturnKey == 1):#High scores
             pass
-        elif(vueReturnKey == 2):#Quitter
+        elif(vueReturnKey == 2):#Quitter"
             pass
 
 		
