@@ -18,18 +18,12 @@ class Jeu:
     def getMergedListeEtoile(self):
         grosseListeEtoile = []
         for faction in self.listeFaction:
-                for etoile in faction.listeEtoile:
-                    grosseListeEtoile.append(etoile)
+                grosseListeEtoile.extend(faction.listeEtoile)
         return grosseListeEtoile
     
     def ajoutVaisseau(self):
-        # ajout dans toutes les etoiles sauf etoiles mere
-        for e in self.etoiles:
-            e.flotte.nbVaisseaux += e.nbUsine
-        #ajout dans les etoiles mere
-        self.czin.flottes[0].nbVaisseaux += self.czin.etoiles[0].nbUsine
-        self.gubru.flottes[0].nbVaisseaux += self.gubru.etoiles[0].nbUsine
-        self.humain.flottes[0].nbVaisseaux += self.humain.etoiles[0].nbUsine
+        for faction in self.listeFaction:
+            faction.listeEtoile.updateFlotte()
 
     def gestionTroupes(self):
         self.listeFaction[1].reorganisationDesFlottes() # Gubru
@@ -48,7 +42,6 @@ class Jeu:
                         if(isinstance(gagnant,faction)):                    #si c'est l'attaquant qui a gagne la bataille
                             flotte.destination.flotteStationnaire = Flotte(gagnant,flotte.nbVaisseaux,None)
                             gagnant.changeEtoileOwner(flotte.destination.owner,flotte.destination)
-                            
                         else:                                               #si les defenseurs ont gagne la bataille
                             pass
                         aSupprimer.append(Flotte)
@@ -102,8 +95,8 @@ class Czin(Faction):
         self.listeEtoile.append(Etoile("Etoile Czin",self))
         self.listeEtoile[0].nbUsine = 10
         self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None)
-        self.etoileMere = self.listeEtoile[0]
         self.etoileBase = self.listeEtoile[0]
+        self.etoileBaseProspective = self.listeEtoile[0]
 
         self.distanceGrappe = 4
         self.distance_rassemblement = 6
@@ -127,18 +120,30 @@ class Czin(Faction):
         if(self.mode == self.mode_rassemblement_forces):
             if(3*self.getForceAttaque() <= etoile.flotteStationnaire):
                 self.mode = self.mode_etablir_base
-                self.etoileBase = self.choisirBase()
+                self.etoileBaseProspective = self.choisirBase()
+                self.envoyerNouvelleFlotte(self.listeFlotteEnMouvement,self.etoileBaseProspective)
         elif(self.mode == self.mode_etablir_base):
-            pass
+            if(flotteArrive()):
+                if(self.etoileBaseProspective.owner == self):
+                    self.conquerirGrappe()
+                    self.mode = self.mode_conquerir_grappe
+                else:
+                    self.mode = self.mode_rassemblement_forces
         elif(self.mode == self.mode_conquerir_grappe):
             pass
 
     def reorganisationFlottes(self):
         pass
 
+    def flotteArrive(self):
+        if(self.listeFlotte[0].estRendu()):
+            return True
+        else:
+            return False
+
     def rassemblementForces():
         for etoile in listeEtoile:
-            if(self.getDistance(etoile,self.etoileBase)):
+            if(self.getDistance(etoile,self.etoileBase) < 6):
                 self.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.etoileBase)
 
     def choisirBase():
@@ -155,7 +160,31 @@ class Czin(Faction):
         return etoileRetour
 
     def conquerirGrappe():
-        pass
+        self.initialiserValeurGrappe()
+        self.determinerGrappe()
+        nbParEnvoi = self.getForceAttaque()
+        listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
+        etoilePlusProche = listeDeTouteLesEtoile[0]
+        listeEtoileDejaEnvoi = []
+
+        while(self.etoileDeBase.flotteStationnaire >= nbEnvoi):
+            for(etoile in listeDeTouteLesEtoile):
+                if(etoile != etoilePlusProche):
+                    distance = self.getDistance(etoile,self.etoileBase)
+                    distancePlusProche = self.getDistance(etoilePlusProche,self.etoileBase)
+                    if(distance < distancePlusProche):
+                        if(distance != 0)
+                            if(not listeEtoileDejaEnvoi):
+                                etoilePlusProche = etoile
+                            else:
+                                for(etoileDejaEnvoi in listeEtoileDejaEnvoi):
+                                    if(etoileDejaEnvoi == etoile):
+                                        break
+                                else:
+                                    etoilePlusProche = etoile
+
+            listeEtoileDejaEnvoi.append(etoilePlusProche)
+            self.envoyerNouvelleFlotte(nbEnvoi,etoilePlusProche)
 
 
     def initialiserValeurGrappe():
@@ -164,7 +193,6 @@ class Czin(Faction):
                 etoile.valeurGrappe = 0
 
     def determinerGrappe():
-        self.initialiserValeurGrappe()
         for faction in self.listeFaction:
             for A in faction.listeEtoile:
                 for faction in self.listeFaction:
@@ -244,16 +272,13 @@ class Neutral(Faction):
         fileHandle = open('listeNomEtoile.txt','r')
         self.tabNom = []
         self.random_nom = random.choice(fileHandle.readlines())
-        self.random_nom = self.random_nom.rstrip()
         self.nomTrouver = False
-        self.tabNom.append(self.random_nom)
+        self.tabNom.append(fileHandle.readlines().rstrip())
         while 1:
-            self.random_nom = random.choice(fileHandle.readlines())
-            self.random_nom = self.random_nom.rstrip()
-            self.tabNom.append(random_nom)
-            if not random_nom : break
+            self.tabNom.append(fileHandle.readlines().rstrip())
+            if not fileHandle.readlines() : break
         fileHandle.close()
-        nomRandom = random.choice(self.tabNom)
+        nomRandom = random.choice(tabNom)
         while (self.nomTrouver == False):
             for etoile in self.listeEtoile:
                 if(nomRandom == etoile.nom):
@@ -314,6 +339,8 @@ class Etoile:
             self.spyRank += 1
         self.flotteAuDernierPassage = self.flotteStationnaire.nbVaisseaux
 
+    def updateFlotte(self):
+        self.flotteStationnaire += nbUsine
 
     def getNbVaisseau(self):
         if(self.spyRank == 0 or self.spyRank == 1 or self.spyRank == 2):
