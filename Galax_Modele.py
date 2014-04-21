@@ -5,16 +5,15 @@ import math
 
 #######################################################
 class Jeu:
-	#on doit ajouter une valeur du temps qui passe a utiliser dans la creation de flottes des AI
     def __init__(self):
         nbEtoileNeutre = 50 #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
         print("Le nombre d'etoile est set a la 9eme ligne du modele a " + str(nbEtoileNeutre))
         self.listeFaction = []
+        self.listeFaction.append(Humain(self))
         self.listeFaction.append(Gubru(self))
         self.listeFaction.append(Czin(self))
-        self.listeFaction.append(Humain(self))
         self.listeFaction.append(Neutral(nbEtoileNeutre,self))
-        self.anneePassees = 0
+        self.aneenPassees = 0
        
     def getMergedListeEtoile(self):
         grosseListeEtoile = []
@@ -31,6 +30,10 @@ class Jeu:
         self.czin.flottes[0].nbVaisseaux += self.czin.etoiles[0].nbUsine
         self.gubru.flottes[0].nbVaisseaux += self.gubru.etoiles[0].nbUsine
         self.humain.flottes[0].nbVaisseaux += self.humain.etoiles[0].nbUsine
+
+    def gestionTroupes(self):
+        self.listeFaction[1].reorganisationDesFlottes() # Gubru
+        self.listeFaction[2].reorganisationFlottes() #Czin
 
     def moveFlotteEnMouvement(self):
         aSupprimer = []
@@ -113,6 +116,7 @@ class Czin(Faction):
         self.mode = self.mode_rassemblement_forces
 
 
+    
     def formationFlotte():
         pass
 
@@ -129,17 +133,20 @@ class Czin(Faction):
         elif(self.mode == self.mode_conquerir_grappe):
             pass
 
+    def reorganisationFlottes(self):
+        pass
+
     def rassemblementForces():
         for etoile in listeEtoile:
-            if(self.getDistance(etoile,self.etoileBase))
-            self.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.etoileBase)
+            if(self.getDistance(etoile,self.etoileBase)):
+                self.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.etoileBase)
 
     def choisirBase():
         etoileRetour = None
         for etoile in listeEtoile:
-            if(etoileRetour = None):
+            if(etoileRetour == None):
                 etoileRetour = etoile
-            if(etoile.valeurGrappe = 0):
+            if(etoile.valeurGrappe == 0):
                 etoile.valeurBase = 0
             else:
                 etoile.valeurBase = etoile.valeurGrappe-3*self.getDistance(self.etoileBase,etoile)
@@ -189,8 +196,8 @@ class Gubru(Faction):
         else:
             self.force_attaque = force_attaque_basique * 2
 
-        while(self.listeEtoile[0].nbVaisseaux >= force_attaque+force_attaque_basique ):
-            self.parent.envoyerNouvelleFlotte(self.force_attaque,trouverEtoilePlusPres(self.listeEtoile[0]))
+        while(self.listeEtoile[0].nbVaisseaux >= force_attaque + self.force_attaque_basique ):
+            self.envoyerNouvelleFlotte(self.force_attaque,trouverEtoilePlusPres(self.listeEtoile[0]))
 ########voir les explications dans le commit nomme "Changement majeur dans la gestion des platetes - ajout fn"
             
 
@@ -202,8 +209,8 @@ class Gubru(Faction):
         for faction in self.parent.listeFaction: #pour chaque faction
             if (faction.nom != "Gubru"): # qui ne sont pas Gubru
                 for etoile in faction.listeEtoile: # on regarde a travers toutes les etoiles
-                   distance = abs((etoile.posX - self.listeEtoile[0].posX)+ (etoile.posY - self.listeEtoile[0].posY)) #on etabli la distance
-                   if(distance <= distancePlusPres and self.listeEtoile[0].listeFlotteEnMouvement.destination != etoile): # regarde la plus proche qui n'est PAS deja une cible
+                    distance = abs((etoile.posX - self.listeEtoile[0].posX)+ (etoile.posY - self.listeEtoile[0].posY)) #on etabli la distance
+                    if(distance <= distancePlusPres and self.listeEtoile[0].listeFlotteEnMouvement.destination != etoile): # regarde la plus proche qui n'est PAS deja une cible
                         self.etoilePlusPres = etoile # on a trouver l'etoile la plus pres
                     else:
                         print("il n'y a plus de cibles potentielles")
@@ -234,14 +241,26 @@ class Neutral(Faction):
 
     def donnerNomEtoile(self):
         #en cours de dev.
-        fileHandle = open('listeNomEtoile.txt',r)
-        nom = fileHandle.readLine()
+        fileHandle = open('listeNomEtoile.txt','r')
+        self.random_nom = random.choice(fileHandle.readlines())
+        self.nomTrouver = False
+        # trouver comment bien prendre une etoile pas deja choisi
+        """while (self.nomTrouver == False):
+            for etoile in self.listeEtoile:
+                if(etoile.nom == self.random_nom):
+                    self.random_nom = random.choice(open('listeNomEtoile.txt','r').readlines())
+                    break
+                else:
+                    self.nomTrouver = True
+                    fileHandle.close()"""
         fileHandle.close()
+        return self.random_nom
+
 
 
     def setupListes(self):
         for i in range(self.nbEtoileNeutre):
-            self.listeEtoile.append(Etoile(("Neutral "+str(i)), self))
+            self.listeEtoile.append(Etoile(Neutral.donnerNomEtoile(self), self))
 
 
             
@@ -267,10 +286,6 @@ class Etoile:
         self.nbUsine = random.randint(0,6)
         self.valeurGrappe = 0
         self.valeurBase = 0
-        #voir les explications dans le commit nomme "Changement majeur dans la gestion des platetes - ajout fn"
-        #self.listeFlotteAEnvoyer = [] # pour construire les flottes a envoyer en mission d'attaque. comme cela on peut facilement iterer dans une liste de flotte qui DOIT attaquer
-        #pour ce qui est de la prochaine ligne, je ne vois pas l'interet... mais si tu crois que c'est un feature important, on peut le garder
-        # j'en avais de besoin dans une de mes fonctions mais je m'en suis debarrasser
         print(self.nom,end=' -> ')
         print(str(self.posX)+' '+str(self.posY))#print la position de l'etoile
     
@@ -291,7 +306,7 @@ class Etoile:
 
     def getNbUsine(self):
         if(self.spyRank == 0 or self.spyRank == 1):
-            return -1       #afin de pouvoir donner la liberter de choisir le message aproprie a afficher
+            return -1
         elif(self.spyRank == 2 or self.spyRank == 3 or isinstance(owner,Humain)):
             return self.nbUsine
 
