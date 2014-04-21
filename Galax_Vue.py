@@ -20,7 +20,7 @@ class Vue:
         #self.canvas.bind('<Configure>', self.resize)
         self.canvas.bind('<Button-1>', self.click)
     
-        #self.canvas.pack(expand=True, fill=BOTH)
+        self.canvas.pack()
     
         #image de background
         self.background = PhotoImage(file="cosmosBG.gif")
