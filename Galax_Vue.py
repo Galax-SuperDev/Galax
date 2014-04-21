@@ -11,10 +11,23 @@ class Vue:
         self.root.title('Galax')
         self.root.iconbitmap(default='galaxIcon.ico')
               
+        # taille de l'ecran--------------------------------------
         self.screenWidth = 1280
         self.screenHeight = 768
+        
+        # taille du canva----------------------------------------
         self.width = 1024
         self.height = 640
+        
+        # taille des bouttons du menus---------------------------
+        self.buttonWidth = 200
+        self.buttonHeight = 64
+        
+        self.buttonPosX = 0
+        self.buttonPosY1 = 0
+        self.buttonPosY2 = 0
+        self.buttonPosY3 = 0
+        #--------------------------------------------------------
         self.canvas=Canvas(self.root, width=self.screenWidth, height=self.screenHeight, bg='black')  
               
         #self.canvas.bind('<Configure>', self.resize)
@@ -24,13 +37,21 @@ class Vue:
     
         #image de background
         self.background = PhotoImage(file="cosmosBG.gif")
-        self.canvas.create_image(0,0,anchor=NW,image=self.background)
+        #self.canvas.create_image(0,0,anchor=NW,image=self.background)
         
         self.drawMainMenu()
         
     def click(self,event):
         eventX = event.x
         eventY = event.y
+        print ('x:'+str(eventX)+' y:'+str(eventY))
+        if(eventX >= self.buttonPosX and eventX <= self.buttonPosX+self.buttonWidth):
+            if(eventY >= self.buttonPosY1 and eventY <= self.buttonPosY1+self.buttonHeight):
+                print("button1")
+            elif(eventY >= self.buttonPosY2 and eventY <= self.buttonPosY2+self.buttonHeight):
+                print("button2")
+            elif(eventY >= self.buttonPosY3 and eventY <= self.buttonPosY3+self.buttonHeight):
+                print("button3")
         
     '''
     def resize(self,event):
@@ -90,33 +111,36 @@ class Vue:
         self.buttonWidth = 200
         self.buttonHeight = 64
         
-        buttonPosX = ((self.screenWidth/2)-self.buttonWidth/2)
-        buttonPosY = self.screenHeight/3
+        self.buttonPosX = (self.screenWidth/2)-self.buttonWidth/2
+        
+        self.buttonPosY1 = self.screenHeight/3 
+        self.buttonPosY2 = self.screenHeight/3 + self.buttonHeight + 2
+        self.buttonPosY3 = self.screenHeight/3 + (self.buttonHeight*2) + 4
         
         self.canvas.delete("menu")
         
-        self.canvas.create_rectangle(buttonPosX, buttonPosY,
-                                     buttonPosX+self.buttonWidth, buttonPosY+self.buttonHeight, 
+        self.canvas.create_rectangle(self.buttonPosX, self.buttonPosY1,
+                                     self.buttonPosX+self.buttonWidth, self.buttonPosY1+self.buttonHeight, 
                                      fill='gray', activefill='white', tags='menu')
         
-        self.canvas.create_rectangle(buttonPosX, buttonPosY+self.buttonHeight+2,
-                                     buttonPosX+self.buttonWidth, buttonPosY+(self.buttonHeight*2)+2, 
+        self.canvas.create_rectangle(self.buttonPosX, self.buttonPosY2,
+                                     self.buttonPosX+self.buttonWidth, self.buttonPosY1+(self.buttonHeight*2)+2, 
                                      fill='gray', activefill='white', tags='menu')
         
-        self.canvas.create_rectangle(buttonPosX,buttonPosY+(self.buttonHeight*2)+4,
-                                     buttonPosX+self.buttonWidth,buttonPosY+(self.buttonHeight*3)+4,
+        self.canvas.create_rectangle(self.buttonPosX, self.buttonPosY3,
+                                     self.buttonPosX+self.buttonWidth, self.buttonPosY1+(self.buttonHeight*3)+4,
                                      fill='gray',activefill='white',tags='menu')
         
-        self.canvas.create_text(buttonPosX+100,buttonPosY+32,
+        self.canvas.create_text(self.buttonPosX+100,self.buttonPosY1+32,
                                 text='New game',fill='black',activefill='white',
                                 font=('consolas','16'),
                                 tags='menu')
-        self.canvas.create_text(buttonPosX+100,buttonPosY+96,
+        self.canvas.create_text(self.buttonPosX+100,self.buttonPosY1+96,
                                 text='High scores',
                                 fill='black',activefill='white',
                                 font=('consolas','16'),
                                 tags='menu')
-        self.canvas.create_text(buttonPosX+100,buttonPosY+160,
+        self.canvas.create_text(self.buttonPosX+100,self.buttonPosY1+160,
                                 text='Quit game',
                                 fill='black',activefill='white',
                                 font=('consolas','16'),
