@@ -2,7 +2,8 @@ from tkinter import *
 import time
 
 class Vue:
-    def __init__(self,):
+    def __init__(self,controlleur):
+        self.controlleur = controlleur
         self.factionVaincue=''
         self.listeEtoile=[]
         
@@ -25,6 +26,7 @@ class Vue:
         self.background = PhotoImage(file="cosmosBG.gif")
         self.canvas.create_image(0,0,anchor=NW,image=self.background)
         
+        self.drawMainMenu()
         
     def click(self,event):
         eventX = event.x
