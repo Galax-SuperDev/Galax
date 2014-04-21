@@ -7,6 +7,8 @@ class Vue:
         self.factionVaincue=''
         self.listeEtoiles=[]
         
+        self.etatVue = 0
+        
         self.root=Tk()
         self.root.title('Galax')
         self.root.iconbitmap(default='galaxIcon.ico')
@@ -46,15 +48,20 @@ class Vue:
         eventY = event.y
         print ('x:'+str(eventX)+' y:'+str(eventY))
         
-        if(eventX >= self.buttonPosX and eventX <= self.buttonPosX+self.buttonWidth):
-            if(eventY >= self.buttonPosY1 and eventY <= self.buttonPosY1+self.buttonHeight):
-                print("button1",end=' ')
-                self.controlleur.menuLoop(0)
-            elif(eventY >= self.buttonPosY2 and eventY <= self.buttonPosY2+self.buttonHeight):
-                print("button2",end=' ')
-            elif(eventY >= self.buttonPosY3 and eventY <= self.buttonPosY3+self.buttonHeight):
-                print("button3",end=' ')
-        
+        # permet de savoir si la partie de jeu est debutee
+        if(self.etatVue == 0):
+            if(eventX >= self.buttonPosX and eventX <= self.buttonPosX+self.buttonWidth):
+                if(eventY >= self.buttonPosY1 and eventY <= self.buttonPosY1+self.buttonHeight):
+                    print("button1",end=' ')
+                    self.controlleur.menuLoop(0)
+                    self.etatVue = 1
+                elif(eventY >= self.buttonPosY2 and eventY <= self.buttonPosY2+self.buttonHeight):
+                    print("button2",end=' ')
+                elif(eventY >= self.buttonPosY3 and eventY <= self.buttonPosY3+self.buttonHeight):
+                    print("button3",end=' ')
+        else:
+            print('game is running')
+                
     '''
     def resize(self,event):
         self.screenWidth = event.width
