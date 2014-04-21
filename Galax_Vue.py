@@ -46,7 +46,7 @@ class Vue:
     def click(self,event):
         eventX = event.x
         eventY = event.y
-        print ('x:'+str(eventX)+' y:'+str(eventY))
+        print ('x:'+str(eventX)+' y:'+str(eventY),end=' ')
         
         # permet de savoir si la partie de jeu est debutee
         if(self.etatVue == 0):
@@ -94,10 +94,31 @@ class Vue:
                                      self.screenWidth,self.screenHeight-128,
                                      fill='gray',tags="menuBar")
         
+        self.canvas.create_text(self.screenWidth-256,100,anchor=NW,
+                        text='texte bidon 121212\ntataBoutlamine\nstune nuit a la belle\netoile',fill='black',
+                        font=('consolas','16'),
+                        tags='menu')
+        
     def drawBottomMenu(self):
         self.canvas.create_rectangle(0,self.screenHeight-128,
                                      self.screenWidth,self.screenHeight,
                                      fill='gray',tags="menuBar")
+        
+        # dessin du boutton de fin de tour
+        self.canvas.create_rectangle(self.screenWidth-241,self.screenHeight-115,
+                                     self.screenWidth-15,self.screenHeight-15,
+                                     fill='gray50',activefill='gray40',
+                                     tags='endTurnButton')
+        
+        self.canvas.create_text(self.screenWidth-200,self.screenHeight-80,anchor=NW,
+                                text='Fin du tour',fill='black',
+                                font=('consolas','16'),
+                                tags='menu')
+        
+        self.canvas.create_rectangle(200,self.screenHeight-115,
+                                     600,self.screenHeight-15,
+                                     fill='gray50',activefill='gray40',
+                                     tags='endTurnButton')
 
     def drawEtoiles(self):
         for e in self.listeEtoiles:
