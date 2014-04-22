@@ -50,6 +50,7 @@ class Vue:
         self.background = PhotoImage(file="background.gif")
         self.sideBarLeftImg = PhotoImage(file="sidebarLeft.gif")
         self.sideBarImg = PhotoImage(file="sidebarbot.gif")
+        self.endTurnImg = PhotoImage(file="endTurnButton.gif")
         
         self.imagesPlanete = []
         
@@ -98,7 +99,7 @@ class Vue:
                     print("button3")
         elif(self.etatVue == 1):
             for e in self.listeEtoiles:
-                
+        
                 posX = self.normPosX(e.posX)
                 posY = self.normPosY(e.posY)
                 
@@ -115,6 +116,7 @@ class Vue:
                         self.canvas.delete('cursor')
                         self.canvas.delete('cursorDest')
                         self.canvas.delete('trajet')
+                        
                         self.canvas.create_image(cursorX, cursorY, image=self.imageCursor.image, anchor=CENTER,tags='cursor')
                         
                         self.canvas.delete('menu')
@@ -123,11 +125,7 @@ class Vue:
                                                 text="nom de l'etoile",fill='white',
                                                 font=('consolas','12'),
                                                 tags='menu')
-                        
-                        self.canvas.create_text(self.screenWidth-220,74,anchor=NW,
-                                                text=e.nom,fill='white',
-                                                font=('consolas','12'),
-                                                tags='menu')
+                        self.drawNomEtoile(e)
                         
                         self.canvas.create_rectangle(200,self.screenHeight-115,
                                              220,self.screenHeight-15,
@@ -183,11 +181,8 @@ class Vue:
                                             font=('consolas','12'),
                                             tags='menu')
                     
-                    self.canvas.create_text(self.screenWidth-220,74,anchor=NW,
-                                            text=e.nom,fill='white',
-                                            font=('consolas','12'),
-                                            tags='menu')
-
+                    self.drawNomEtoile(e)
+                    
     def mouseDragged(self,event):
         eventX = event.x
         eventY = event.y
@@ -237,33 +232,17 @@ class Vue:
         self.drawSideMenu()
         
     def drawSideMenu(self):
-        
-        
         self.canvas.create_image(self.screenWidth-256,0,image=self.sideBarLeftImg,anchor=NW,tags='menuBar')
-        '''
-        self.canvas.create_rectangle(self.screenWidth-256,0,
-                                     self.screenWidth,self.screenHeight-128,
-                                     fill='gray',tags="menuBar")
-        '''
 
         
     def drawBottomMenu(self):
-        
-        
         self.canvas.create_image(0,self.screenHeight-128,image=self.sideBarImg,anchor=NW)
-        '''
-        self.canvas.create_rectangle(0,self.screenHeight-128,
-                                     self.screenWidth,self.screenHeight,
-                                     fill='gray',tags="menuBar")
-        '''
-        # dessin du boutton de fin de tour --------------------------------------------
-        self.canvas.create_rectangle(self.screenWidth-241,self.screenHeight-115,
-                                     self.screenWidth-15,self.screenHeight-15,
-                                     fill='gray50',activefill='gray40',
-                                     tags='endTurnButton')
         
-        self.canvas.create_text(self.screenWidth-200,self.screenHeight-80,anchor=NW,
-                                text='Fin du tour',fill='black',
+        # dessin du boutton de fin de tour --------------------------------------------
+        self.canvas.create_image(self.screenWidth-256,self.screenHeight-128,image=self.endTurnImg,anchor=NW,tags='endTurnButton')
+
+        self.canvas.create_text(self.screenWidth-200,self.screenHeight-90,anchor=NW,
+                                text='Fin du tour',fill='white',
                                 font=('consolas','16'),
                                 tags='endTurnButton')
         #-------------------------------------------------------------------------------
@@ -280,16 +259,20 @@ class Vue:
                              tags='sliderFlotte')
         
         self.canvas.create_rectangle(620,self.screenHeight-113,
-                                     660,self.screenHeight-68,fill='gray40',tags='addFlotteButton')
+                                     660,self.screenHeight-68,fill='gray40',activefill='gray',
+                                     tags='addFlotteButton')
         
         self.canvas.create_rectangle(670,self.screenHeight-113,
-                                     710,self.screenHeight-68,fill='gray40',tags='addFlotteButton')
+                                     710,self.screenHeight-68,fill='gray40',activefill='gray',
+                                     tags='addFlotteButton')
         
         self.canvas.create_rectangle(620,self.screenHeight-61,
-                                     660,self.screenHeight-18,fill='gray40',tags='addFlotteButton')
+                                     660,self.screenHeight-18,fill='gray40',activefill='gray',
+                                     tags='addFlotteButton')
         
         self.canvas.create_rectangle(670,self.screenHeight-61,
-                                     710,self.screenHeight-18,fill='gray40',tags='addFlotteButton')
+                                     710,self.screenHeight-18,fill='gray40',activefill='gray',
+                                     tags='addFlotteButton')
         
 
     def drawEtoiles(self):
@@ -298,6 +281,12 @@ class Vue:
             posX = self.normPosX(e.posX)
             posY = self.normPosY(e.posY)
             self.canvas.create_image(posX, posY, image=self.imagesPlanete[random.randint(0,7)].image, anchor=NW,tags="etoile")
+            
+    def drawNomEtoile(self,etoile):
+        self.canvas.create_text(self.screenWidth-220,74,anchor=NW,
+                        text=etoile.nom,fill='white',
+                        font=('consolas','12'),
+                        tags='menu')
         
 
             
