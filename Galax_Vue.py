@@ -47,8 +47,7 @@ class Vue:
         self.canvas.pack()
     
         #image de background
-        self.background = PhotoImage(file="cosmosBG.gif")
-        
+        self.background = PhotoImage(file="background.gif")
         
         self.imagesPlanete = []
         
@@ -121,18 +120,19 @@ class Vue:
                                                 text=e.nom,fill='black',
                                                 font=('consolas','12'),
                                                 tags='menu')
+                        
+                        self.canvas.delete('sliderFlotte')
+                        self.canvas.create_rectangle(200,self.screenHeight-115,
+                                                     220,self.screenHeight-15,
+                                                     fill='black',
+                                                     tags='sliderFlotte')
                 
                 if(eventX >= 200 and eventX <= 220):
                     if(eventY >= self.screenHeight-115 and eventY <= self.screenHeight-15):
                         self.clickOnSlider = 1
                     else:
                         self.clickOnSlider = 0
-                        '''
-                        self.canvas.create_rectangle(200,self.screenHeight-115,
-                             220,self.screenHeight-15,
-                             fill='black',
-                             tags='sliderFlotte')
-                        '''
+
                         
     def rightClick(self,event):
         eventX = event.x
