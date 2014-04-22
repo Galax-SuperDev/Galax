@@ -74,11 +74,7 @@ class Faction:
     def changeEtoileOwner(self,oldOwner,etoileCapturer):
         etoileCapturer.gotTakenBy(self)
         self.listeEtoile.append(oldOwner.listeEtoile.pop(oldOwner.listeEtoile.index(etoileCapturer)))
-
-    def envoyerNouvelleFlotte(self,nbVaisseaux,etoileDestination):
-        nouvelleFlotte = Flotte(self,nbVaisseaux,etoileDestination)
-        nouvelleFlotte.calcTravelTime()
-        self.listeFlotteEnMouvement.append(nouvelleFlotte)        
+      
 
 class Humain(Faction):
     def __init__(self, parent):
@@ -122,6 +118,8 @@ class Czin(Faction):
                 self.mode = self.mode_etablir_base
                 self.etoileBaseProspective = self.choisirBase()
                 self.envoyerNouvelleFlotte(self.listeFlotteEnMouvement,self.etoileBaseProspective)
+            else:
+                self.rassemblementForces()
         elif(self.mode == self.mode_etablir_base):
             if(flotteArrive()):
                 if(self.etoileBaseProspective.owner == self):
@@ -297,6 +295,11 @@ class Etoile:
         self.valeurBase = 0
         print(self.nom,end=' -> ')
         print(str(self.posX)+' '+str(self.posY))#print la position de l'etoile
+
+    def envoyerNouvelleFlotte(self,nbVaisseaux,etoileDestination):
+        nouvelleFlotte = Flotte(self,nbVaisseaux,etoileDestination)
+        nouvelleFlotte.calcTravelTime()
+        self.listeFlotteEnMouvement.append(nouvelleFlotte)  
     
     def ajoutVaisseau(self): 
         self.flotteStationnaire.nbVaisseaux += self.nbUsine
