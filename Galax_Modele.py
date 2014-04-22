@@ -18,7 +18,7 @@ class Jeu:
     def getMergedListeEtoile(self):
         grosseListeEtoile = []
         for faction in self.listeFaction:
-                grosseListeEtoile.extend(faction.listeEtoile)
+            grosseListeEtoile.extend(faction.listeEtoile)
         return grosseListeEtoile
     
     def ajoutVaisseau(self):
@@ -27,7 +27,7 @@ class Jeu:
 
     def gestionTroupes(self):
         self.listeFaction[1].reorganisationDesFlottes() # Gubru
-        self.listeFaction[2].reorganisationFlottes() #Czin
+        self.listeFaction[2].reorganisationDesFlottes() #Czin
 
     def moveFlotteEnMouvement(self):
         aSupprimer = []
@@ -93,6 +93,7 @@ class Czin(Faction):
         self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None)
         self.etoileBase = self.listeEtoile[0]
         self.etoileBaseProspective = self.listeEtoile[0]
+        self.tempsGrappe = None
 
         self.distanceGrappe = 4
         self.distance_rassemblement = 6
@@ -104,15 +105,24 @@ class Czin(Faction):
         self.mode_conquerir_grappe = 2
         self.mode = self.mode_rassemblement_forces
 
-
-    
-    def formationFlotte():
-        pass
-
-    def getForceAttaque():
+    def getForceAttaque(self):
         return self.parent.anneePassees * self.nbr_vaisseaux_par_attaque * self.force_attaque_basique
 
-    def choixMode(etoile):
+    def reorganisationDesFlottes(self):
+        if(self.mode == self.mode_etablir_base):
+            if(flotteArrive()):
+                if(self.etoileBaseProspective.owner == self):#si la baseProspective est en possession des Czins
+                    self.etoileBase = self.etoileBaseProspective
+                    self.conquerirGrappe()
+                    self.mode = self.mode_conquerir_grappe
+                else:                                       #sinon, ça veux dire que les defenceurs ont gagne.
+                    self.mode = self.mode_rassemblement_forces
+                    self.etoileBase = self.listeEtoile[0]   #on remet l_etoile mere comme base
+
+        if(self.mode == self.mode_conquerir_grappe):
+            if(self.listeFlotteEnMouvement[len(self.listeFlotteEnMouvement)-1].estRendu()):
+                self.mode = self.mode_rassemblement_forces
+
         if(self.mode == self.mode_rassemblement_forces):
             if(3*self.getForceAttaque() <= etoile.flotteStationnaire):
                 self.mode = self.mode_etablir_base
@@ -120,18 +130,6 @@ class Czin(Faction):
                 self.envoyerNouvelleFlotte(self.listeFlotteEnMouvement,self.etoileBaseProspective)
             else:
                 self.rassemblementForces()
-        elif(self.mode == self.mode_etablir_base):
-            if(flotteArrive()):
-                if(self.etoileBaseProspective.owner == self):
-                    self.conquerirGrappe()
-                    self.mode = self.mode_conquerir_grappe
-                else:
-                    self.mode = self.mode_rassemblement_forces
-        elif(self.mode == self.mode_conquerir_grappe):
-            pass
-
-    def reorganisationFlottes(self):
-        pass
 
     def flotteArrive(self):
         if(self.listeFlotte[0].estRendu()):
@@ -139,12 +137,12 @@ class Czin(Faction):
         else:
             return False
 
-    def rassemblementForces(): # est-ce la fonction a mettre dans jeu.gestionTroupes?
+    def rassemblementForces(self): # est-ce la fonction a mettre dans jeu.gestionTroupes?
         for etoile in listeEtoile:
             if(self.getDistance(etoile,self.etoileBase) < 6):
                 self.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.etoileBase)
 
-    def choisirBase():
+    def choisirBase(self):
         etoileRetour = None
         for etoile in listeEtoile:
             if(etoileRetour == None):
@@ -157,7 +155,7 @@ class Czin(Faction):
                     etoileRetour = etoile
         return etoileRetour
 
-    def conquerirGrappe():
+    def conquerirGrappe(self):
         self.initialiserValeurGrappe()
         self.determinerGrappe()
         nbParEnvoi = self.getForceAttaque()
@@ -184,13 +182,12 @@ class Czin(Faction):
             listeEtoileDejaEnvoi.append(etoilePlusProche)
             self.envoyerNouvelleFlotte(nbEnvoi,etoilePlusProche)
 
-
-    def initialiserValeurGrappe():
+    def initialiserValeurGrappe(self):
         for faction in self.parent.listeFaction:
             for etoile in faction.listeEtoile:
                 etoile.valeurGrappe = 0
 
-    def determinerGrappe():
+    def determinerGrappe(self):
         for faction in self.listeFaction:
             for A in faction.listeEtoile:
                 for faction in self.listeFaction:
