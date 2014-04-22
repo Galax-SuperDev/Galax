@@ -141,7 +141,7 @@ class Czin(Faction):
         else:
             return False
 
-    def rassemblementForces():
+    def rassemblementForces(): # est-ce la fonction a mettre dans jeu.gestionTroupes?
         for etoile in listeEtoile:
             if(self.getDistance(etoile,self.etoileBase) < 6):
                 self.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.etoileBase)
@@ -237,7 +237,7 @@ class Gubru(Faction):
         for faction in self.parent.listeFaction: #pour chaque faction
             if (faction.nom != "Gubru"): # qui ne sont pas Gubru
                 for etoile in faction.listeEtoile: # on regarde a travers toutes les etoiles
-                    distance = abs((etoile.posX - self.listeEtoile[0].posX)+ (etoile.posY - self.listeEtoile[0].posY)) #on etabli la distance
+                    distance = math.sqrt((etoile.posX- self.listeEtoile[0].posX)**2+(etoile.posY- self.listeEtoile[0].posY)**2) #on etabli la distance
                     if(distance <= distancePlusPres and self.listeEtoile[0].listeFlotteEnMouvement.destination != etoile): # regarde la plus proche qui n'est PAS deja une cible
                         self.etoilePlusPres = etoile # on a trouver l'etoile la plus pres
                     else:
@@ -252,11 +252,6 @@ class Gubru(Faction):
                     self.parent.envoyerNouvelleFlotte(etoile.flotteStationnaire - 15,self.listeEtoile[0])
                 else:
                     self.parent.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.listeEtoile[0])
-    
-    def changerEtoileMere(self):
-        # insert dans la liste a [0] et pop ou l'etoile etait avant dans la liste
-        # a voir ou faire cette fonction
-        pass
     		
         
 
@@ -329,7 +324,7 @@ class Etoile:
     def gotTakenBy(self,newOwner):
         self.owner = newOwner
         self.flotteAuDernierPassage = 0
-
+####dans setPosition ajouter un intervalle pour ne pas que les etoiles ce chevauche ( puisqu'elle on un certain rayon)
     def setPosition(self):  #attribut une position au hasare a l'etoile en verifiant de ne pas la mettre sur une etoile existante
         while(True):        #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au return
             posX = random.randint(0,100)
@@ -365,8 +360,7 @@ class Flotte:
         self.nbVaisseaux += laFlotteAnnexe.nbVaisseaux
 
     def calcTravelTime(self):
-        distance = abs((self.destination.posX - self.owner.posX)+
-                            (self.destination.posY - self.owner.posY))
+        distance = math.sqrt((self.destination.posX-self.owner.posX)**2+(self.destination.posY-self.owner.posY)**2) 
         if(distance <= 2):
             self.travelTime = distance/2
         else:
