@@ -223,7 +223,7 @@ class Gubru(Faction):
             self.force_attaque = force_attaque_basique * 2
 
         while(self.listeEtoile[0].nbVaisseaux >= force_attaque + self.force_attaque_basique ):
-            self.envoyerNouvelleFlotte(self.force_attaque,trouverEtoilePlusPres(self.listeEtoile[0]))
+            self.listeEtoile[0].envoyerNouvelleFlotte(self.force_attaque,trouverEtoilePlusPres(self.listeEtoile[0]))
 ########voir les explications dans le commit nomme "Changement majeur dans la gestion des platetes - ajout fn"
             
 
@@ -247,9 +247,9 @@ class Gubru(Faction):
         for etoile in self.listeEtoile:
             if(etoile != self.listeEtoile[0]): # on ne veux pas envoyer de flottes de l'etoile mere vers l'etoile mere
                 if (etoile.flotteStationnaire > 25):
-                    self.parent.envoyerNouvelleFlotte(etoile.flotteStationnaire - 15,self.listeEtoile[0])
+                    self.etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire - 15,self.listeEtoile[0])
                 else:
-                    self.parent.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.listeEtoile[0])
+                    self.etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.listeEtoile[0])
     		
         
 
