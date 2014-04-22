@@ -327,8 +327,8 @@ class Etoile:
 ####dans setPosition ajouter un intervalle pour ne pas que les etoiles ce chevauche ( puisqu'elle on un certain rayon)
     def setPosition(self):  #attribut une position au hasare a l'etoile en verifiant de ne pas la mettre sur une etoile existante
         while(True):        #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au return
-            posX = random.randint(0,100)
-            posY = random.randint(0,100)  
+            posX = random.randint(0,32)
+            posY = random.randint(0,20)  
             for faction in self.owner.parent.listeFaction:          #pour chaque faction dans la liste de faction
                 for etoile in faction.listeEtoile:                  #pour chaque etoile dans la liste d'etoile contenue dans chaque faction
                     if( posX==etoile.posX and posY==etoile.posY):   #si la position de l'etoile courante est egale a la position d'une autre etoile
