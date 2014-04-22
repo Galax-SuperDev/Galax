@@ -48,6 +48,8 @@ class Vue:
     
         #image de background
         self.background = PhotoImage(file="background.gif")
+        self.sideBarLeftImg = PhotoImage(file="sidebarLeft.gif")
+        self.sideBarImg = PhotoImage(file="sidebarbot.gif")
         
         self.imagesPlanete = []
         
@@ -116,16 +118,21 @@ class Vue:
                         self.canvas.create_image(cursorX, cursorY, image=self.imageCursor.image, anchor=CENTER,tags='cursor')
                         
                         self.canvas.delete('menu')
-                        self.canvas.create_text(self.screenWidth-220,25,anchor=NW,
-                                                text=e.nom,fill='black',
+                        
+                        self.canvas.create_text(self.screenWidth-220,57,anchor=NW,
+                                                text="nom de l'etoile",fill='white',
                                                 font=('consolas','12'),
                                                 tags='menu')
                         
-                        self.canvas.delete('sliderFlotte')
+                        self.canvas.create_text(self.screenWidth-220,74,anchor=NW,
+                                                text=e.nom,fill='white',
+                                                font=('consolas','12'),
+                                                tags='menu')
+                        
                         self.canvas.create_rectangle(200,self.screenHeight-115,
-                                                     220,self.screenHeight-15,
-                                                     fill='black',
-                                                     tags='sliderFlotte')
+                                             220,self.screenHeight-15,
+                                             fill='gray20',activefill='gray40',
+                                             tags='sliderFlotte')
                 
                 if(eventX >= 200 and eventX <= 220):
                     if(eventY >= self.screenHeight-115 and eventY <= self.screenHeight-15):
@@ -170,8 +177,14 @@ class Vue:
                                             destX,destY,fill='white',tags='trajet')
                     
                     self.canvas.delete('menu')
-                    self.canvas.create_text(self.screenWidth-220,25,anchor=NW,
-                                            text=e.nom,fill='black',
+                    
+                    self.canvas.create_text(self.screenWidth-220,57,anchor=NW,
+                                            text="nom de l'etoile",fill='white',
+                                            font=('consolas','12'),
+                                            tags='menu')
+                    
+                    self.canvas.create_text(self.screenWidth-220,74,anchor=NW,
+                                            text=e.nom,fill='white',
                                             font=('consolas','12'),
                                             tags='menu')
 
@@ -179,15 +192,18 @@ class Vue:
         eventX = event.x
         eventY = event.y
         sliderPosX = 200
-        if(self.clickOnSlider == 1):
-            sliderPosX = eventX
-            if(sliderPosX > 580):
-                sliderPosX = 580
-            if(sliderPosX < 200):
-                sliderPosX = 200
-            self.canvas.delete('sliderFlotte')
-            self.canvas.create_rectangle(sliderPosX,self.screenHeight-115,
-                                         sliderPosX+20,self.screenHeight-15,fill='black',tags='sliderFlotte')
+        if(eventY >= 640):
+            if(self.clickOnSlider == 1):
+                sliderPosX = eventX
+                if(sliderPosX > 580):
+                    sliderPosX = 580
+                if(sliderPosX < 200):
+                    sliderPosX = 200
+                self.canvas.delete('sliderFlotte')
+                self.canvas.create_rectangle(sliderPosX,self.screenHeight-115,
+                                             sliderPosX+20,self.screenHeight-15,
+                                             fill='gray20',activefill='gray40',
+                                             tags='sliderFlotte')
 
         
         
@@ -221,17 +237,25 @@ class Vue:
         self.drawSideMenu()
         
     def drawSideMenu(self):
+        
+        
+        self.canvas.create_image(self.screenWidth-256,0,image=self.sideBarLeftImg,anchor=NW,tags='menuBar')
+        '''
         self.canvas.create_rectangle(self.screenWidth-256,0,
                                      self.screenWidth,self.screenHeight-128,
                                      fill='gray',tags="menuBar")
-        
+        '''
 
         
     def drawBottomMenu(self):
+        
+        
+        self.canvas.create_image(0,self.screenHeight-128,image=self.sideBarImg,anchor=NW)
+        '''
         self.canvas.create_rectangle(0,self.screenHeight-128,
                                      self.screenWidth,self.screenHeight,
                                      fill='gray',tags="menuBar")
-        
+        '''
         # dessin du boutton de fin de tour --------------------------------------------
         self.canvas.create_rectangle(self.screenWidth-241,self.screenHeight-115,
                                      self.screenWidth-15,self.screenHeight-15,
@@ -247,25 +271,25 @@ class Vue:
         # dessin du slider de gestion des flottes --------------------------------------
         self.canvas.create_rectangle(200,self.screenHeight-115,
                                      600,self.screenHeight-15,
-                                     fill='gray50',activefill='gray40',
+                                     fill='gray50',
                                      tags='sliderBackground')
         
         self.canvas.create_rectangle(200,self.screenHeight-115,
                              220,self.screenHeight-15,
-                             fill='black',
+                             fill='gray20',activefill='gray40',
                              tags='sliderFlotte')
         
-        self.canvas.create_rectangle(620,self.screenHeight-115,
-                                     660,self.screenHeight-75,fill='gray40',tags='addFlotteButton')
+        self.canvas.create_rectangle(620,self.screenHeight-113,
+                                     660,self.screenHeight-68,fill='gray40',tags='addFlotteButton')
         
-        self.canvas.create_rectangle(670,self.screenHeight-115,
-                                     710,self.screenHeight-75,fill='gray40',tags='addFlotteButton')
+        self.canvas.create_rectangle(670,self.screenHeight-113,
+                                     710,self.screenHeight-68,fill='gray40',tags='addFlotteButton')
         
-        self.canvas.create_rectangle(620,self.screenHeight-65,
-                                     660,self.screenHeight-25,fill='gray40',tags='addFlotteButton')
+        self.canvas.create_rectangle(620,self.screenHeight-61,
+                                     660,self.screenHeight-18,fill='gray40',tags='addFlotteButton')
         
-        self.canvas.create_rectangle(670,self.screenHeight-65,
-                                     710,self.screenHeight-25,fill='gray40',tags='addFlotteButton')
+        self.canvas.create_rectangle(670,self.screenHeight-61,
+                                     710,self.screenHeight-18,fill='gray40',tags='addFlotteButton')
         
 
     def drawEtoiles(self):
