@@ -35,11 +35,14 @@ class Vue:
         self.etoileOrigin = None
         self.etoileDestination = None
         #--------------------------------------------------------
+        self.clickOnSlider = 0
+        #--------------------------------------------------------
         self.canvas=Canvas(self.root, width=self.screenWidth, height=self.screenHeight, bg='black')  
               
         #self.canvas.bind('<Configure>', self.resize)
         self.canvas.bind('<Button-1>', self.leftClick)
-        self.canvas.bind('<Button-3>',self.rightClick)
+        self.canvas.bind('<Button-3>', self.rightClick)
+        self.canvas.bind('<B1-Motion>', self.mouseDragged)
     
         self.canvas.pack()
     
@@ -118,6 +121,18 @@ class Vue:
                                                 text=e.nom,fill='black',
                                                 font=('consolas','12'),
                                                 tags='menu')
+                
+                if(eventX >= 200 and eventX <= 220):
+                    if(eventY >= self.screenHeight-115 and eventY <= self.screenHeight-15):
+                        self.clickOnSlider = 1
+                    else:
+                        self.clickOnSlider = 0
+                        '''
+                        self.canvas.create_rectangle(200,self.screenHeight-115,
+                             220,self.screenHeight-15,
+                             fill='black',
+                             tags='sliderFlotte')
+                        '''
                         
     def rightClick(self,event):
         eventX = event.x
@@ -159,7 +174,25 @@ class Vue:
                                             text=e.nom,fill='black',
                                             font=('consolas','12'),
                                             tags='menu')
-                    
+
+    def mouseDragged(self,event):
+        eventX = event.x
+        eventY = event.y
+        sliderPosX = 200
+        if(self.clickOnSlider == 1):
+            sliderPosX = eventX
+            if(sliderPosX > 580):
+                sliderPosX = 580
+            if(sliderPosX < 200):
+                sliderPosX = 200
+            self.canvas.delete('sliderFlotte')
+            self.canvas.create_rectangle(sliderPosX,self.screenHeight-115,
+                                         sliderPosX+20,self.screenHeight-15,fill='black',tags='sliderFlotte')
+
+        
+        
+        
+                        
     '''
     def resize(self,event):
         self.screenWidth = event.width
@@ -208,13 +241,32 @@ class Vue:
         self.canvas.create_text(self.screenWidth-200,self.screenHeight-80,anchor=NW,
                                 text='Fin du tour',fill='black',
                                 font=('consolas','16'),
-                                tags='finTour')
+                                tags='endTurnButton')
+        #-------------------------------------------------------------------------------
         
+        # dessin du slider de gestion des flottes --------------------------------------
         self.canvas.create_rectangle(200,self.screenHeight-115,
                                      600,self.screenHeight-15,
                                      fill='gray50',activefill='gray40',
-                                     tags='endTurnButton')
-        #-------------------------------------------------------------------------------
+                                     tags='sliderBackground')
+        
+        self.canvas.create_rectangle(200,self.screenHeight-115,
+                             220,self.screenHeight-15,
+                             fill='black',
+                             tags='sliderFlotte')
+        
+        self.canvas.create_rectangle(620,self.screenHeight-115,
+                                     660,self.screenHeight-75,fill='gray40',tags='addFlotteButton')
+        
+        self.canvas.create_rectangle(670,self.screenHeight-115,
+                                     710,self.screenHeight-75,fill='gray40',tags='addFlotteButton')
+        
+        self.canvas.create_rectangle(620,self.screenHeight-65,
+                                     660,self.screenHeight-25,fill='gray40',tags='addFlotteButton')
+        
+        self.canvas.create_rectangle(670,self.screenHeight-65,
+                                     710,self.screenHeight-25,fill='gray40',tags='addFlotteButton')
+        
 
     def drawEtoiles(self):
         self.canvas.create_image(0,0,image=self.background,anchor=NW)
