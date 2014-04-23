@@ -35,7 +35,6 @@ class Vue:
         
         self.slider = None
         self.b_launchDansCanvas = None
-        self.b_EndTurn = None
 
         self.etoileOrigin = None
         self.etoileDestination = None
@@ -150,7 +149,8 @@ class Vue:
                         self.canvas.delete('trajet')
                         if(self.b_launchDansCanvas != None):
                             print("deleteMenu")
-                            self.canvas.delete('bottThings')
+                            self.canvas.delete('slider')
+                            self.canvas.delete('launcher')
                         
                         self.canvas.create_image(cursorX, cursorY, image=self.imageCursor.image, anchor=CENTER,tags='cursor')
                         
@@ -249,21 +249,32 @@ class Vue:
         
         # dessin du boutton de fin de tour --------------------------------------------
         self.canvas.create_image(self.screenWidth-256,self.screenHeight-128,image=self.endTurnImg,anchor=NW,tags='endTurnButton')
-        self.boutonFinDeTour()
+
+        self.canvas.create_text(self.screenWidth-200,self.screenHeight-90,anchor=NW,
+                                text='Fin du tour',fill='white',
+                                font=('consolas','16'),
+                                tags='endTurnButton')
         self.sliderFlottes()
         self.boutonLaunch()
+
+    def reset(self):
+        self.canvas.delete('slider')
+        self.sliderFlottes()
+
     
+    def actionBoutonLaunch(self):
+        self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.slider.get())
+        self.reset()
+
     def boutonLaunch(self):
         if(self.controlleur.isHumanMovePossible(self.etoileOrigin) and self.etoileDestination):
             print("dans launchButton")
             boutonLaunch = Button(self.root,text="LAUNCH!",
-                                     command= lambda: self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.slider.get()))
-            self.b_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunch,tags='bottThings')
+                                     command= self.actionBoutonLaunch)
+            self.b_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunch,tags='launcher')
 
     def boutonFinDeTour(self):
-        boutonFinTour = Button(self.root,width=10,height=1,text="Fin du tour",command=self.controlleur.gameLoop,bg='black',fg='red')
-
-        self.b_EndTurn = self.canvas.create_window(self.screenWidth-165,self.screenHeight-90,window=boutonFinTour,anchor=NW)
+        boutonFinTour = Button(self.root,text="Fin du tour",command=self.controlleur.gameLoop)
 
 
         #-------------------------------------------------------------------------------
@@ -276,7 +287,7 @@ class Vue:
             self.slider = Scale(self.root,from_=0,to=int(self.etoileOrigin.flotteStationnaire.nbVaisseaux),
                             orient=HORIZONTAL,label="Nombres de vaisseaux a envoyer",
                             bg='gray40',length=300)
-            slider_dansCanvas = self.canvas.create_window(200,715,window=self.slider,tags='bottThings')
+            slider_dansCanvas = self.canvas.create_window(200,715,window=self.slider,tags='slider')
 
 
 
