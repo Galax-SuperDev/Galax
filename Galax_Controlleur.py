@@ -40,7 +40,7 @@ class Controlleur:
 
     def launchPress(self,etoileDepart,etoileDestination,force):
         if(self.isHumanMovePossible(etoileDepart)):
-            print("flotte lancee")
+            print("Flotte:" + str(force) + ", Depart:" + str(etoileDepart.nom) + ", Destination:" + str(etoileDestination.nom))
             self.jeu.lancerFlotteHumain(etoileDepart,etoileDestination,force)
 
     def isHumanMovePossible(self,etoileDepart):
