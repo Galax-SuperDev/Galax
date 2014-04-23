@@ -5,15 +5,15 @@ import math
 
 #######################################################
 class Jeu:
-    def __init__(self):
-        nbEtoileNeutre = 50 #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
+    def __init__(self,nbEtoilesTotales=50):
+        nbEtoileNeutre = nbEtoilesTotales #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
         print("Le nombre d'etoile est set a la 9eme ligne du modele a " + str(nbEtoileNeutre))
         self.listeFaction = []
         self.listeFaction.append(Humain(self))
         self.listeFaction.append(Gubru(self))
         self.listeFaction.append(Czin(self))
         self.listeFaction.append(Neutral(nbEtoileNeutre,self))
-        self.aneenPassees = 0
+        self.anneePassees = 0
        
     def getMergedListeEtoile(self):
         grosseListeEtoile = []
