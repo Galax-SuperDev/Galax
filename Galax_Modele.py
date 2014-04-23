@@ -120,7 +120,7 @@ class Czin(Faction):
 
     def reorganisationDesFlottes(self):
         if(self.mode == self.mode_etablir_base):
-            if(flotteArrive()):
+            if(self.flotteArrive()):
                 if(self.etoileBaseProspective.owner == self):#si la baseProspective est en possession des Czins
                     self.etoileBase = self.etoileBaseProspective
                     self.conquerirGrappe()
@@ -142,15 +142,15 @@ class Czin(Faction):
                 self.rassemblementForces()
 
     def flotteArrive(self):
-        if(self.listeFlotte[0].estRendu()):
+        if(self.listeFlotteEnMouvement[0].estRendu()):
             return True
         else:
             return False
 
     def rassemblementForces(self): # est-ce la fonction a mettre dans jeu.gestionTroupes?
-        for etoile in listeEtoile:
+        for etoile in self.listeEtoile:
             if(self.getDistance(etoile,self.etoileBase) < 6):
-                self.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.etoileBase)
+                etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire.nbVaisseaux,self.etoileBase)
 
     def choisirBase(self):
         etoileRetour = None
@@ -168,14 +168,14 @@ class Czin(Faction):
     def conquerirGrappe(self):
         self.initialiserValeurGrappe()
         self.determinerGrappe()
-        nbParEnvoi = self.getForceAttaque()
+        nbEnvoi = self.getForceAttaque()
         listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
         etoilePlusProche = listeDeTouteLesEtoile[0]
         listeEtoileDejaEnvoi = []
 
-        while(self.etoileDeBase.flotteStationnaire >= nbEnvoi):
+        while(self.etoileBase.flotteStationnaire.nbVaisseaux >= nbEnvoi):
             for etoile in listeDeTouteLesEtoile:
-                if(not isinstance(etoile.owner,self)):
+                if(not isinstance(etoile.owner,Czin)):
                     if(etoile != etoilePlusProche):
                         distance = self.getDistance(etoile,self.etoileBase)
                         distancePlusProche = self.getDistance(etoilePlusProche,self.etoileBase)
@@ -191,7 +191,7 @@ class Czin(Faction):
                                         etoilePlusProche = etoile
 
             listeEtoileDejaEnvoi.append(etoilePlusProche)
-            self.envoyerNouvelleFlotte(nbEnvoi,etoilePlusProche)
+            self.etoileBase.envoyerNouvelleFlotte(nbEnvoi,etoilePlusProche)
 
     def initialiserValeurGrappe(self):
         for faction in self.parent.listeFaction:
@@ -199,11 +199,11 @@ class Czin(Faction):
                 etoile.valeurGrappe = 0
 
     def determinerGrappe(self):
-        for faction in self.listeFaction:
+        for faction in self.parent.listeFaction:
             for A in faction.listeEtoile:
-                for faction in self.listeFaction:
+                for faction in self.parent.listeFaction:
                     for B in faction.listeEtoile:
-                        distance = getDistance(A,B)
+                        distance = self.getDistance(A,B)
                         if(distance <= self.distanceGrappe):
                             s = self.distanceGrappe - distance + 1
                             A.valeurGrappe = s*s
@@ -316,7 +316,7 @@ class Etoile:
             print("flotte nulle")
 
     def ajoutVaisseau(self):
-        self.flotteStationnaire.nbVaisseaux += self.nbUsine
+        self.flotteStationnaire.nbVaisseaux += self.nbUsine*random.randint(1,12)
 
     def updateSpyRank(self):
         if(self.spyRank < 3):
@@ -399,7 +399,7 @@ class Flotte:
         tourDefence = True
         if(nbVaisseauDefence > self.nbVaisseaux):
             print("Possibilite d'attaque surprise...")
-            if(attaqueSurprise(nbVaisseauDefence)):
+            if(self.attaqueSurprise(nbVaisseauDefence)):
                 tourDefence = False
                 print("Ahaha! Attaque surprise!!!")
         while(nbVaisseauDefence > 0 and self.nbVaisseaux > 0):
@@ -426,7 +426,9 @@ class Flotte:
 
 
     def attaqueSurprise(self,nbVaisseauDefence):
+        print("attaqueSurprise avant ratio")
         ratio = nbVaisseauDefence/self.nbVaisseaux
+        print("dans fonct Attaque")
         if(ratio < 5):
             P = ratio / 10
         elif(ratio < 20):
@@ -434,7 +436,7 @@ class Flotte:
         else:
             P = 0.95
 
-        if(random.randint(0,100) < P*100):
+        if(random.randint(1,100) < P*100):
             return True
         else:
             return False
