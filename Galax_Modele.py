@@ -28,7 +28,8 @@ class Jeu:
     
     def ajoutVaisseau(self):
         for faction in self.listeFaction:
-            faction.listeEtoile.updateFlotte()
+            for etoile in faction.listeEtoile:
+                etoile.updateFlotte()
 
     def gestionTroupes(self):
         self.listeFaction[1].reorganisationDesFlottes() # Gubru
@@ -40,7 +41,7 @@ class Jeu:
             for flotte in faction.listeFlotteEnMouvement:
                 if(flotte.estRendu()):
                     flotte.isMoving=False
-                    if(isinstance(flotte.owner,flotte.destination.owner)):#si c'est la meme faction
+                    if(flotte.owner == flotte.destination.owner):#si c'est la meme faction
                         flotte.destination.mergeFlotte(flotte)
                     else:                                                 #Sinon, c'est la bataille!
                         gagnant = flotte.bataille()
@@ -136,7 +137,7 @@ class Czin(Faction):
             if(3*self.getForceAttaque() <= self.etoileBase.flotteStationnaire.nbVaisseaux):
                 self.mode = self.mode_etablir_base
                 self.etoileBaseProspective = self.choisirBase()
-                self.etoileBase.envoyerNouvelleFlotte(self.listeFlotteEnMouvement,self.etoileBaseProspective)
+                self.etoileBase.envoyerNouvelleFlotte(self.etoileBase.flotteStationnaire.nbVaisseaux,self.etoileBaseProspective)
             else:
                 self.rassemblementForces()
 
@@ -388,13 +389,13 @@ class Flotte:
             return False
     
     def updateTravelTime(self):
-        travelTime -= 0.1
+        self.travelTime -= 0.1
     
     def setDestination(self,etoile):
         self.destination = etoile
 
     def bataille(self):
-        nbVaisseauDefence = self.destination.listeFlotte[0].nbVaisseaux
+        nbVaisseauDefence = self.destination.flotteStationnaire.nbVaisseaux
         tourDefence = True
         if(nbVaisseauDefence > self.nbVaisseaux):
             print("Possibilite d'attaque surprise...")
@@ -410,11 +411,11 @@ class Flotte:
             if(tourDefence):
                 self.nbVaisseaux += turnValue
                 tourDefence = False
-                print("attaquant")
+                #print("attaquant")
             else:
                 nbVaisseauDefence += turnValue
                 tourDefence = True
-                print("defenseur")
+                #print("defenseur")
         else:
             if(nbVaisseauDefence == 0):
                 return self.owner
