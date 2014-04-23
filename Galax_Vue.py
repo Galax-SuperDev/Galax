@@ -78,7 +78,7 @@ class Vue:
         
         self.drawMainMenu()
         
-    def normPosX(self,position):
+    def normPosX(self,position): #fuckage ici!
         pos = int((position*self.width)/32)+32
         return pos
     
