@@ -62,7 +62,12 @@ class Vue:
         for i in range(0,8):
             self.imagesPlanete.append(PngImageTk("planete"+str(i)+".png"))
             self.imagesPlanete[i].convert()
-        
+
+        self.imagesOmbre = []
+        for i in range(3):
+            self.imagesOmbre.append(PngImageTk("ombre"+str(i)+".png"))
+            self.imagesOmbre[i].convert()
+    
         self.imageCursor = PngImageTk("cursor.png")
         self.imageCursor.convert()
         
@@ -306,11 +311,6 @@ class Vue:
                 self.canvas.create_image(posX, posY, image=self.imagesOmbre[2].image, anchor=NW,tags="etoile")
 
             self.canvas.create_image(posX, posY, image=self.imagesPlanete[random.randint(0,7)].image, anchor=NW,tags="etoile")
-
-            self.imagesOmbre = []
-            for i in range(3):
-                self.imagesOmbre.append(PngImageTk("ombre"+str(i)+".png"))
-                self.imagesOmbre[i].convert()
 
             
     def drawNomEtoile(self,etoile):
