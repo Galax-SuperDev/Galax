@@ -68,7 +68,7 @@ class Vue:
         for i in range(3):
             self.imagesOmbre.append(PngImageTk("ombre"+str(i)+".png"))
             self.imagesOmbre[i].convert()
-    
+            
         self.imageCursor = PngImageTk("cursor.png")
         self.imageCursor.convert()
         
