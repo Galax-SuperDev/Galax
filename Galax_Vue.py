@@ -35,6 +35,7 @@ class Vue:
         
         self.slider = None
         self.b_launchDansCanvas = None
+        self.b_EndTurn = None
 
         self.etoileOrigin = None
         self.etoileDestination = None
@@ -248,11 +249,7 @@ class Vue:
         
         # dessin du boutton de fin de tour --------------------------------------------
         self.canvas.create_image(self.screenWidth-256,self.screenHeight-128,image=self.endTurnImg,anchor=NW,tags='endTurnButton')
-
-        self.canvas.create_text(self.screenWidth-200,self.screenHeight-90,anchor=NW,
-                                text='Fin du tour',fill='white',
-                                font=('consolas','16'),
-                                tags='endTurnButton')
+        self.boutonFinDeTour()
         self.sliderFlottes()
         self.boutonLaunch()
     
@@ -264,7 +261,9 @@ class Vue:
             self.b_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunch,tags='bottThings')
 
     def boutonFinDeTour(self):
-        boutonFinTour = Button(self.root,text="Fin du tour",command=self.controlleur.gameLoop)
+        boutonFinTour = Button(self.root,width=10,height=1,text="Fin du tour",command=self.controlleur.gameLoop,bg='black',fg='red')
+
+        self.b_EndTurn = self.canvas.create_window(self.screenWidth-165,self.screenHeight-90,window=boutonFinTour,anchor=NW)
 
 
         #-------------------------------------------------------------------------------

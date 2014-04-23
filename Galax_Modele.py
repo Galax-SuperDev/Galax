@@ -133,7 +133,7 @@ class Czin(Faction):
                 self.mode = self.mode_rassemblement_forces
 
         if(self.mode == self.mode_rassemblement_forces):
-            if(3*self.getForceAttaque() <= etoile.flotteStationnaire):
+            if(3*self.getForceAttaque() <= self.etoile.flotteStationnaire):
                 self.mode = self.mode_etablir_base
                 self.etoileBaseProspective = self.choisirBase()
                 self.envoyerNouvelleFlotte(self.listeFlotteEnMouvement,self.etoileBaseProspective)

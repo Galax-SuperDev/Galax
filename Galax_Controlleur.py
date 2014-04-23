@@ -22,7 +22,7 @@ class Controlleur:
             self.vue.choixNbrEtoiles()
 
     def gameLoop(self):
-        jeu.gestionTroupe()
+        self.jeu.gestionTroupes()
         for i in range(10):
             self.jeu.moveFlotteEnMouvement()
         self.jeu.ajoutVaisseau()
