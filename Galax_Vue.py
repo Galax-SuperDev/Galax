@@ -328,17 +328,12 @@ class Vue:
                 tags='menu')
         
         self.canvas.create_text(self.screenWidth-220,138,anchor=NW,
-                text="nombre d'usines:"+str(etoile.nbUsine),fill='white',
-                font=('consolas','10'),
-                tags='menu')
-        
-        self.canvas.create_text(self.screenWidth-220,138,anchor=NW,
-                text="nombre d'usines:"+str(etoile.nbUsine),fill='white',
+                text="nombre d'usines:"+str(etoile.getNbUsine()),fill='white',
                 font=('consolas','10'),
                 tags='menu')
         
         self.canvas.create_text(self.screenWidth-220,154,anchor=NW,
-                text="vaisseaux:"+str(etoile.flotteStationnaire.nbVaisseaux),fill='white',
+                text="vaisseaux:"+str(etoile.getNbVaisseau()),fill='white',
                 font=('consolas','10'),
                 tags='menu')
         
@@ -350,14 +345,14 @@ class Vue:
                 tags='menu')
         
         self.canvas.create_text(self.screenWidth-220,218,anchor=NW,
-                        text="nom de l'etoile:",fill='white',
-                        font=('consolas','10'),
-                        tags='menu')
+                text="nom de l'etoile:",fill='white',
+                font=('consolas','10'),
+                tags='menu')
         
         self.canvas.create_text(self.screenWidth-220,234,anchor=NW,
-                        text=etoile.nom,fill='white',
-                        font=('consolas','10'),
-                        tags='menu')
+                text=etoile.nom,fill='white',
+                font=('consolas','10'),
+                tags='menu')
 
         self.canvas.create_text(self.screenWidth-220,250,anchor=NW,
                 text="x:"+str(etoile.posX)+" y:"+str(etoile.posY),fill='white',
@@ -377,16 +372,11 @@ class Vue:
         self.canvas.create_text(self.screenWidth-220,298,anchor=NW,
                 text="vaisseaux:"+str(etoile.getNbVaisseau()),fill='white',
                 font=('consolas','10'),
-                tags='menu')   
-        
-
-            
+                tags='menu')             
 #----------------------------------------------------------------------------------------
 #---------------------   JEU  -----------------------------------------------------------  
 #----------------------------------------------------------------------------------------
 
-
-            
 #----------------------------------------------------------------------------------------
 #---------------------   MAIN MENU ------------------------------------------------------  
 #----------------------------------------------------------------------------------------
