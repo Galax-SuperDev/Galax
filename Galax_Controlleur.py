@@ -14,7 +14,7 @@ class Controlleur:
             else:
                 self.jeu = Galax_Modele.Jeu(self.vue.getNbrEtoiles())
             self.vue.drawJeu(self.jeu.getMergedListeEtoile())
-        elif(vueReturnKey == 1):#High scores
+        elif(vueReturnKey == 1):#High scoresetoilePlusProche
             print("pasEncore implementer")
         elif(vueReturnKey == 2):#Quitter"
             self.vue.root.destroy()
