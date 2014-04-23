@@ -149,7 +149,7 @@ class Vue:
                         self.canvas.delete('trajet')
                         if(self.b_launchDansCanvas != None):
                             print("deleteMenu")
-                            self.b_launchDansCanvas.delete('bottThings')
+                            self.canvas.delete('bottThings')
                         
                         self.canvas.create_image(cursorX, cursorY, image=self.imageCursor.image, anchor=CENTER,tags='cursor')
                         
@@ -159,13 +159,8 @@ class Vue:
                                                 text="nom de l'etoile",fill='white',
                                                 font=('consolas','12'),
                                                 tags='menu')
+                        self.sliderFlottes()
                         self.drawNomEtoile(e)
-                
-                if(eventX >= 200 and eventX <= 220):
-                    if(eventY >= self.screenHeight-115 and eventY <= self.screenHeight-15):
-                        self.clickOnSlider = 1
-                    else:
-                        self.clickOnSlider = 0
 
                         
     def rightClick(self,event):
@@ -261,10 +256,10 @@ class Vue:
         self.boutonLaunch()
     
     def boutonLaunch(self):
-        if(self.etoileOrigin and self.etoileDestination):
+        if(self.controlleur.isHumanMovePossible(self.etoileOrigin) and self.etoileDestination):
             print("dans launchButton")
             boutonLaunch = Button(self.root,text="LAUNCH!",
-                                     command=self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.slider.get()))
+                                     command= lambda: self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.slider.get()))
             self.b_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunch,tags='bottThings')
 
 
@@ -273,7 +268,7 @@ class Vue:
 
         # dessin du slider de gestion des flottes --------------------------------------
     def sliderFlottes(self): 
-        if(self.etoileOrigin and self.controlleur.isHumanMovePossible(self.etoileOrigin)):
+        if(self.controlleur.isHumanMovePossible(self.etoileOrigin)):
             print("dans sliderFlottes")
             self.slider = Scale(self.root,from_=0,to=int(self.etoileOrigin.flotteStationnaire.nbVaisseaux),
                             orient=HORIZONTAL,label="Nombres de vaisseaux a envoyer",
