@@ -91,7 +91,7 @@ class Humain(Faction):
         self.nom = 'Humain'
         self.listeEtoile.append(Etoile("Soleil",self))
         self.listeEtoile[0].nbUsine = 10
-        self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None)
+        self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None,None)
 
 
 class Czin(Faction):
@@ -100,7 +100,7 @@ class Czin(Faction):
         self.nom = 'Czin'
         self.listeEtoile.append(Etoile("Etoile Czin",self))
         self.listeEtoile[0].nbUsine = 10
-        self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None)
+        self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None,None)
         self.etoileBase = self.listeEtoile[0]
         self.etoileBaseProspective = self.listeEtoile[0]
         self.tempsGrappe = None
@@ -220,7 +220,7 @@ class Gubru(Faction):
         self.nom = 'Gubru'
         self.listeEtoile.append(Etoile("Etoile Gubru",self))
         self.listeEtoile[0].nbUsine = 10
-        self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None)
+        self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None,None)
         self.nbr_vaisseau_par_attaque = 5
         self.force_attaque_basique = 10
 
@@ -295,7 +295,7 @@ class Etoile:
         self.posX = None
         self.posY = None
         self.setPosition()#afin d'attribuer une valeur a posX et posY
-        self.flotteStationnaire = Flotte(self,0,None)
+        self.flotteStationnaire = Flotte(self.owner, 0, None, None)
         self.flotteAuDernierPassage = -1
         self.spyRank = 0
         self.nbUsine = random.randint(0,6)
@@ -307,7 +307,7 @@ class Etoile:
 
     def envoyerNouvelleFlotte(self,nbVaisseaux,etoileDestination):
         if(nbVaisseaux > 0):
-            nouvelleFlotte = Flotte(self,nbVaisseaux,etoileDestination)
+            nouvelleFlotte = Flotte(self.owner, nbVaisseaux, self, etoileDestination)
             nouvelleFlotte.calcTravelTime()
             self.owner.listeFlotteEnMouvement.append(nouvelleFlotte)
             self.flotteStationnaire.nbVaisseaux -= nbVaisseaux
@@ -366,17 +366,18 @@ class Etoile:
 
 #######################################################
 class Flotte:
-    def __init__(self,owner,nbVaisseaux,etoileDestination):
+    def __init__(self,owner,nbVaisseaux,etoileDepart,etoileDestination):
         self.owner = owner
         self.nbVaisseaux = nbVaisseaux
         self.travelTime = 0
+        self.depart = etoileDepart
         self.destination = etoileDestination
 
     def mergeFlotte(laFlotteAnnexe):
         self.nbVaisseaux += laFlotteAnnexe.nbVaisseaux
 
     def calcTravelTime(self):
-        distance = math.sqrt((self.destination.posX-self.owner.posX)**2+(self.destination.posY-self.owner.posY)**2)
+        distance = math.sqrt((self.destination.posX-self.depart.posX)**2+(self.destination.posY-self.depart.posY)**2)
         if(distance <= 2):
             self.travelTime = distance/2
         else:
