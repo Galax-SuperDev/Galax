@@ -165,19 +165,20 @@ class Czin(Faction):
 
         while(self.etoileDeBase.flotteStationnaire >= nbEnvoi):
             for etoile in listeDeTouteLesEtoile:
-                if(etoile != etoilePlusProche):
-                    distance = self.getDistance(etoile,self.etoileBase)
-                    distancePlusProche = self.getDistance(etoilePlusProche,self.etoileBase)
-                    if(distance < distancePlusProche):
-                        if(distance != 0):
-                            if(not listeEtoileDejaEnvoi):
-                                etoilePlusProche = etoile
-                            else:
-                                for etoileDejaEnvoi in listeEtoileDejaEnvoi:
-                                    if(etoileDejaEnvoi == etoile):
-                                        break
-                                else:
+                if(not isinstance(etoile.owner,self)):
+                    if(etoile != etoilePlusProche):
+                        distance = self.getDistance(etoile,self.etoileBase)
+                        distancePlusProche = self.getDistance(etoilePlusProche,self.etoileBase)
+                        if(distance < distancePlusProche):
+                            if(distance != 0):
+                                if(not listeEtoileDejaEnvoi):
                                     etoilePlusProche = etoile
+                                else:
+                                    for etoileDejaEnvoi in listeEtoileDejaEnvoi:
+                                        if(etoileDejaEnvoi == etoile):
+                                            break
+                                    else:
+                                        etoilePlusProche = etoile
 
             listeEtoileDejaEnvoi.append(etoilePlusProche)
             self.envoyerNouvelleFlotte(nbEnvoi,etoilePlusProche)
