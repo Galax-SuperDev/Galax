@@ -27,15 +27,15 @@ class Controlleur:
             self.jeu.moveFlotteEnMouvement()
         self.jeu.ajoutVaisseau()
         self.jeu.anneePassees +=1
-        if(jeu.listeFaction[0].isDead()):
-            vue.drawFinPartie(False)
-        if(jeu.listeFaction[1].isDead() and jeu.listeFaction[1].isDead()):
-            vue.drawFinPartie(True)
-            vue.drawMainMenu()
-        if(jeu.listeFaction[1].isDead()):
-            vue.setFactionVaincue(True)
-        if(jeu.listeFaction[1].isDead()):
-            vue.setFactionVaincue(False)
+        if(self.jeu.listeFaction[0].isDead()):
+            self.vue.drawFinPartie(False)
+        if(self.jeu.listeFaction[1].isDead() and jeu.listeFaction[1].isDead()):
+            self.vue.drawFinPartie(True)
+            self.vue.drawMainMenu()
+        if(self.jeu.listeFaction[1].isDead()):
+            self.vue.setFactionVaincue(True)
+        if(self.jeu.listeFaction[1].isDead()):
+            self.vue.setFactionVaincue(False)
         self.vue.drawJeu(self.jeu.getMergedListeEtoile())
 
     def launchPress(self,etoileDepart,etoileDestination,force):

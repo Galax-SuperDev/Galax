@@ -16,8 +16,8 @@ class Jeu:
         self.listeFaction.append(Neutral(nbEtoileNeutre,self))
         self.anneePassees = 0
         print(self.compteurEtoile)
-        
-       
+
+
     def getMergedListeEtoile(self):
         grosseListeEtoile = []
         for faction in self.listeFaction:
@@ -25,11 +25,11 @@ class Jeu:
                 grosseListeEtoile.append(etoile)
 
         return grosseListeEtoile
-    
+
     def ajoutVaisseau(self):
         for faction in self.listeFaction:
             for etoile in faction.listeEtoile:
-                etoile.updateFlotte()
+                etoile.ajoutVaisseau()
 
     def gestionTroupes(self):
         self.listeFaction[1].reorganisationDesFlottes() # Gubru
@@ -45,7 +45,7 @@ class Jeu:
                         flotte.destination.mergeFlotte(flotte)
                     else:                                                 #Sinon, c'est la bataille!
                         gagnant = flotte.bataille()
-                        if(isinstance(gagnant,faction)):                    #si c'est l'attaquant qui a gagne la bataille
+                        if(gagnant == faction):                    #si c'est l'attaquant qui a gagne la bataille
                             flotte.destination.flotteStationnaire = Flotte(gagnant,flotte.nbVaisseaux,None)
                             gagnant.changeEtoileOwner(flotte.destination.owner,flotte.destination)
                         else:                                               #si les defenseurs ont gagne la bataille
@@ -54,9 +54,9 @@ class Jeu:
                 else:
                     flotte.updateTravelTime()
         if(aSupprimer):
-            supprimeurDeListe(aSupprimer)
+            self.supprimeurDeListe(aSupprimer)
 
-    def supprimeurDeListe(uneListeSupprimable):
+    def supprimeurDeListe(self,uneListeSupprimable):
         for itemSupprimable in uneListeSupprimable:
             del itemSupprimable
 
@@ -77,13 +77,13 @@ class Faction:
         self.parent = parent
 
     def isDead(self):
-        if(self.listeEtoile.size() == 0 and self.listeFlotteEnMouvement == 0):
+        if(len(self.listeEtoile) == 0 and self.listeFlotteEnMouvement == 0):
             return True
 
     def changeEtoileOwner(self,oldOwner,etoileCapturer):
         etoileCapturer.gotTakenBy(self)
         self.listeEtoile.append(oldOwner.listeEtoile.pop(oldOwner.listeEtoile.index(etoileCapturer)))
-      
+
 
 class Humain(Faction):
     def __init__(self, parent):
@@ -93,7 +93,7 @@ class Humain(Faction):
         self.listeEtoile[0].nbUsine = 10
         self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None)
 
-        
+
 class Czin(Faction):
     def __init__(self, parent):
         Faction.__init__(self, parent)
@@ -125,7 +125,7 @@ class Czin(Faction):
                     self.etoileBase = self.etoileBaseProspective
                     self.conquerirGrappe()
                     self.mode = self.mode_conquerir_grappe
-                else:                                       #sinon, ça veux dire que les defenceurs ont gagne.
+                else:                                       #sinon, Ã§a veux dire que les defenceurs ont gagne.
                     self.mode = self.mode_rassemblement_forces
                     self.etoileBase = self.listeEtoile[0]   #on remet l_etoile mere comme base
 
@@ -213,7 +213,7 @@ class Czin(Faction):
 
 
 
-                
+
 class Gubru(Faction):
     def __init__(self, parent):
         Faction.__init__(self, parent)
@@ -233,7 +233,7 @@ class Gubru(Faction):
         while(self.listeEtoile[0].nbVaisseaux >= force_attaque + self.force_attaque_basique ):
             self.listeEtoile[0].envoyerNouvelleFlotte(self.force_attaque,trouverEtoilePlusPres(self.listeEtoile[0]))
 ########voir les explications dans le commit nomme "Changement majeur dans la gestion des platetes - ajout fn"
-            
+
 
     def trouverEtoilePlusPres(self,etoileDeBase):
         self.etoilePlusPres = None
@@ -258,8 +258,8 @@ class Gubru(Faction):
                     self.etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire - 15,self.listeEtoile[0])
                 else:
                     self.etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.listeEtoile[0])
-    		
-        
+
+
 
 class Neutral(Faction):
     def __init__(self, nbEtoileNeutre, parent):
@@ -268,7 +268,7 @@ class Neutral(Faction):
         self.nom = 'Neutral'
         self.tabNomPossible = []
         self.setupListes()
-        
+
 
     def donnerNomEtoile(self):
         fileHandle = open('listeNomEtoile.txt','r')
@@ -284,7 +284,7 @@ class Neutral(Faction):
             self.listeEtoile.append(Etoile(Neutral.donnerNomEtoile(self), self))
 
 
-            
+
 
 
 #######################################################
@@ -314,8 +314,8 @@ class Etoile:
             print("flotte avec du peuple")
         else:
             print("flotte nulle")
-    
-    def ajoutVaisseau(self): 
+
+    def ajoutVaisseau(self):
         self.flotteStationnaire.nbVaisseaux += self.nbUsine
 
     def updateSpyRank(self):
@@ -323,22 +323,19 @@ class Etoile:
             self.spyRank += 1
         self.flotteAuDernierPassage = self.flotteStationnaire.nbVaisseaux
 
-    def updateFlotte(self):
-        self.flotteStationnaire += nbUsine
-
     def getNbVaisseau(self):
-        if(isinstance(owner,Humain) or self.spyRank == 3):
+        if(isinstance(self.owner,Humain) or self.spyRank == 3):
             return self.flotteStationnaire.nbVaisseaux
         elif(self.spyRank == 0 or self.spyRank == 1 or self.spyRank == 2):
             return self.flotteAuDernierPassage
-        
+
 
     def getNbUsine(self):
-        if(isinstance(owner,Humain) or self.spyRank == 2 or self.spyRank == 3):
+        if(isinstance(self.owner,Humain) or self.spyRank == 2 or self.spyRank == 3):
             return self.nbUsine
         if(self.spyRank == 0 or self.spyRank == 1):
             return -1
-        
+
 
     def gotTakenBy(self,newOwner):
         self.owner = newOwner
@@ -347,14 +344,14 @@ class Etoile:
     def setPosition(self):  #attribut une position au hasare a l'etoile en verifiant de ne pas la mettre sur une etoile existante
         while(True):        #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au return
             posX = random.randint(0,31)
-            posY = random.randint(0,19)  
+            posY = random.randint(0,19)
             for faction in self.owner.parent.listeFaction:          #pour chaque faction dans la liste de faction
                 for etoile in faction.listeEtoile:                  #pour chaque etoile dans la liste d'etoile contenue dans chaque faction
                     if( posX==etoile.posX and posY==etoile.posY):   #si la position de l'etoile courante est egale a la position d'une autre etoile
                         break       #fait sortir du 2e "for", qui nous ammene au second break
                 else:               #si la 2e boucle finis sans heurt
                     continue        #retourne et continue l'iteration dans le 1er "for"
-                break               #fait sortir du 1er "for", qui nous ammène au "while" au dessus
+                break               #fait sortir du 1er "for", qui nous ammÃ¨ne au "while" au dessus
             else:                   #si les deux boucles ont finis sans rencontrer une seule fois une etoile a la meme position que l'etoile courante
                 self.posX = posX    #attribution de la position en x
                 self.posY = posY    #attribution de la position en y
@@ -379,7 +376,7 @@ class Flotte:
         self.nbVaisseaux += laFlotteAnnexe.nbVaisseaux
 
     def calcTravelTime(self):
-        distance = math.sqrt((self.destination.posX-self.owner.posX)**2+(self.destination.posY-self.owner.posY)**2) 
+        distance = math.sqrt((self.destination.posX-self.owner.posX)**2+(self.destination.posY-self.owner.posY)**2)
         if(distance <= 2):
             self.travelTime = distance/2
         else:
@@ -390,10 +387,10 @@ class Flotte:
             return True
         else:
             return False
-    
+
     def updateTravelTime(self):
         self.travelTime -= 0.1
-    
+
     def setDestination(self,etoile):
         self.destination = etoile
 
@@ -404,21 +401,22 @@ class Flotte:
             print("Possibilite d'attaque surprise...")
             if(attaqueSurprise(nbVaisseauDefence)):
                 tourDefence = False
-                print("Ahaha! Attaque surprise!!!")        
-        while(nbVaisseauDefence != 0 or self.nbVaisseaux != 0):
+                print("Ahaha! Attaque surprise!!!")
+        while(nbVaisseauDefence > 0 and self.nbVaisseaux > 0):
             if(random.randint(0,10) > 6):
                 turnValue = -1
                 print("Perte d'un vaisseau pour les",end=' ')
             else:
                 turnValue = 0
+                print("Aucune perte pour les",end=' ')
             if(tourDefence):
                 self.nbVaisseaux += turnValue
                 tourDefence = False
-                #print("attaquant")
+                print("attaquant")
             else:
                 nbVaisseauDefence += turnValue
                 tourDefence = True
-                #print("defenseur")
+                print("defenseur")
         else:
             if(nbVaisseauDefence == 0):
                 return self.owner
@@ -429,7 +427,7 @@ class Flotte:
 
     def attaqueSurprise(self,nbVaisseauDefence):
         ratio = nbVaisseauDefence/self.nbVaisseaux
-        if(ratio < 5): 
+        if(ratio < 5):
             P = ratio / 10
         elif(ratio < 20):
             P = (3 * ratio + 35) /100
