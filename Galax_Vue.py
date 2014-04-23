@@ -263,6 +263,9 @@ class Vue:
                                      command= lambda: self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.slider.get()))
             self.b_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunch,tags='bottThings')
 
+    def boutonFinDeTour(self):
+        boutonFinTour = Button(self.root,text="Fin du tour",command=self.controlleur.gameLoop)
+
 
         #-------------------------------------------------------------------------------
         
@@ -308,14 +311,14 @@ class Vue:
                 tags='menu')
         
         self.canvas.create_text(self.screenWidth-220,74,anchor=NW,
-                        text="nom de l'etoile:",fill='white',
-                        font=('consolas','10'),
-                        tags='menu')
+                text="nom de l'etoile:",fill='white',
+                font=('consolas','10'),
+                tags='menu')
         
         self.canvas.create_text(self.screenWidth-220,90,anchor=NW,
-                        text=etoile.nom,fill='white',
-                        font=('consolas','10'),
-                        tags='menu')
+                text=etoile.nom,fill='white',
+                font=('consolas','10'),
+                tags='menu')
 
         self.canvas.create_text(self.screenWidth-220,106,anchor=NW,
                 text="x:"+str(etoile.posX)+" y:"+str(etoile.posY),fill='white',
