@@ -90,6 +90,7 @@ class Humain(Faction):
         self.nom = 'Humain'
         self.listeEtoile.append(Etoile("Soleil",self))
         self.listeEtoile[0].nbUsine = 10
+        self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None)
 
         
 class Czin(Faction):
@@ -304,9 +305,13 @@ class Etoile:
         self.owner.parent.compteurEtoile += 1
 
     def envoyerNouvelleFlotte(self,nbVaisseaux,etoileDestination):
-        nouvelleFlotte = Flotte(self,nbVaisseaux,etoileDestination)
-        nouvelleFlotte.calcTravelTime()
-        self.listeFlotteEnMouvement.append(nouvelleFlotte)  
+        if(nbVaisseaux > 0):
+            nouvelleFlotte = Flotte(self,nbVaisseaux,etoileDestination)
+            nouvelleFlotte.calcTravelTime()
+            self.owner.listeFlotteEnMouvement.append(nouvelleFlotte)
+            print("flotte avec du peuple")
+        else:
+            print("flotte nulle")
     
     def ajoutVaisseau(self): 
         self.flotteStationnaire.nbVaisseaux += self.nbUsine

@@ -38,11 +38,12 @@ class Controlleur:
             vue.setFactionVaincue(False)
         self.vue.drawJeu(self.jeu.getMergedListeEtoile())
 
-    def launchPress(self,etoileDepart,etoileDestination):
-        self.jeu.lancerFlotte(etoileDepart,etoileDestination)
+    def launchPress(self,etoileDepart,etoileDestination,force):
+        if(self.isHumanMovePossible(etoileDepart)):
+            self.jeu.lancerFlotteHumain(etoileDepart,etoileDestination,force)
 
     def isHumanMovePossible(self,etoileDepart):
-        if(isinstance(etoileDepart.owner,Galax_Modele.Humain)):
+        if(etoileDepart and isinstance(etoileDepart.owner,Galax_Modele.Humain)):
             return True
         return False
 

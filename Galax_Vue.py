@@ -33,6 +33,9 @@ class Vue:
         self.buttonPosY2 = 0
         self.buttonPosY3 = 0
         
+        self.slider = None
+        self.b_launchDansCanvas = None
+
         self.etoileOrigin = None
         self.etoileDestination = None
         #--------------------------------------------------------
@@ -43,7 +46,6 @@ class Vue:
         #self.canvas.bind('<Configure>', self.resize)
         self.canvas.bind('<Button-1>', self.leftClick)
         self.canvas.bind('<Button-3>', self.rightClick)
-        self.canvas.bind('<B1-Motion>', self.mouseDragged)
     
         self.canvas.pack()
     
@@ -92,13 +94,14 @@ class Vue:
     def choixNbrEtoiles(self):
         self.nbrEtoiles = 0
         inputNbrEtoile = Scale(self.root,from_=20, to=80,orient=HORIZONTAL)
-        inputNbrEtoile.pack()
+        inputNbrEtoile_dansCanevas = self.canvas.create_window(self.screenWidth/2,600,
+                                                     window=inputNbrEtoile,tags='nbEtoile')
         def sendReponse():
             self.nbrEtoiles = inputNbrEtoile.get()
-            inputNbrEtoile.destroy()
-            b.destroy()
+            self.canvas.delete('nbEtoile')
         b = Button(self.root, text="Choisir", width=10, command=sendReponse)
-        b.pack()
+        b_dansCanevas = self.canvas.create_window((self.screenWidth/2),650,
+                                                     window=b,tags='nbEtoile')
 
     def getNbrEtoiles(self):
         return self.nbrEtoiles
@@ -135,6 +138,8 @@ class Vue:
                         print('click sur etoile')
                         
                         self.etoileOrigin = e
+                        self.etoileDestination = None
+                        self.sliderFlottes()
                         
                         cursorX = posX+16
                         cursorY = posY+16
@@ -142,6 +147,9 @@ class Vue:
                         self.canvas.delete('cursor')
                         self.canvas.delete('cursorDest')
                         self.canvas.delete('trajet')
+                        if(self.b_launchDansCanvas != None):
+                            print("deleteMenu")
+                            self.b_launchDansCanvas.delete('bottThings')
                         
                         self.canvas.create_image(cursorX, cursorY, image=self.imageCursor.image, anchor=CENTER,tags='cursor')
                         
@@ -152,11 +160,6 @@ class Vue:
                                                 font=('consolas','12'),
                                                 tags='menu')
                         self.drawNomEtoile(e)
-                        
-                        self.canvas.create_rectangle(200,self.screenHeight-115,
-                                             220,self.screenHeight-15,
-                                             fill='gray20',activefill='gray40',
-                                             tags='sliderFlotte')
                 
                 if(eventX >= 200 and eventX <= 220):
                     if(eventY >= self.screenHeight-115 and eventY <= self.screenHeight-15):
@@ -180,6 +183,7 @@ class Vue:
                     print('click sur etoile')
                     
                     self.etoileDestination = e
+                    self.boutonLaunch()
                     
                     if(self.controlleur.isHumanMovePossible(self.etoileOrigin)):
                         oriX = self.normPosX(self.etoileOrigin.posX)+16
@@ -209,26 +213,6 @@ class Vue:
                                                 tags='menu')
                         
                         self.drawNomEtoile(e)
-                    
-    def mouseDragged(self,event):
-        eventX = event.x
-        eventY = event.y
-        sliderPosX = 200
-        if(eventY >= 640):
-            if(self.clickOnSlider == 1):
-                sliderPosX = eventX
-                if(sliderPosX > 580):
-                    sliderPosX = 580
-                if(sliderPosX < 200):
-                    sliderPosX = 200
-                self.canvas.delete('sliderFlotte')
-                self.canvas.create_rectangle(sliderPosX,self.screenHeight-115,
-                                             sliderPosX+20,self.screenHeight-15,
-                                             fill='gray20',activefill='gray40',
-                                             tags='sliderFlotte')
-
-        
-        
         
                         
     '''
@@ -273,36 +257,32 @@ class Vue:
                                 text='Fin du tour',fill='white',
                                 font=('consolas','16'),
                                 tags='endTurnButton')
+        self.sliderFlottes()
+        self.boutonLaunch()
+    
+    def boutonLaunch(self):
+        if(self.etoileOrigin and self.etoileDestination):
+            print("dans launchButton")
+            boutonLaunch = Button(self.root,text="LAUNCH!",
+                                     command=self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.slider.get()))
+            self.b_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunch,tags='bottThings')
+
+
         #-------------------------------------------------------------------------------
         
-        # dessin du slider de gestion des flottes --------------------------------------
-        self.canvas.create_rectangle(200,self.screenHeight-115,
-                                     600,self.screenHeight-15,
-                                     fill='gray50',
-                                     tags='sliderBackground')
-        
-        self.canvas.create_rectangle(200,self.screenHeight-115,
-                             220,self.screenHeight-15,
-                             fill='gray20',activefill='gray40',
-                             tags='sliderFlotte')
-        
-        self.canvas.create_rectangle(620,self.screenHeight-113,
-                                     660,self.screenHeight-68,fill='gray40',activefill='gray',
-                                     tags='addFlotteButton')
-        
-        self.canvas.create_rectangle(670,self.screenHeight-113,
-                                     710,self.screenHeight-68,fill='gray40',activefill='gray',
-                                     tags='addFlotteButton')
-        
-        self.canvas.create_rectangle(620,self.screenHeight-61,
-                                     660,self.screenHeight-18,fill='gray40',activefill='gray',
-                                     tags='addFlotteButton')
-        
-        self.canvas.create_rectangle(670,self.screenHeight-61,
-                                     710,self.screenHeight-18,fill='gray40',activefill='gray',
-                                     tags='addFlotteButton')
-        
 
+        # dessin du slider de gestion des flottes --------------------------------------
+    def sliderFlottes(self): 
+        if(self.etoileOrigin and self.controlleur.isHumanMovePossible(self.etoileOrigin)):
+            print("dans sliderFlottes")
+            self.slider = Scale(self.root,from_=0,to=int(self.etoileOrigin.flotteStationnaire.nbVaisseaux),
+                            orient=HORIZONTAL,label="Nombres de vaisseaux a envoyer",
+                            bg='gray40',length=300)
+            slider_dansCanvas = self.canvas.create_window(200,715,window=self.slider,tags='bottThings')
+
+
+
+        
     def drawEtoiles(self,listeEtoiles):
         self.canvas.create_image(0,0,image=self.background,anchor=NW)
         for e in listeEtoiles:
@@ -388,7 +368,7 @@ class Vue:
         self.canvas.create_text(self.buttonPosX+100,self.buttonPosY1+226,
                                 text='choix # Etoiles',
                                 fill='black',activefill='white',
-                                font=('consolas','16'),
+                                font=('consolas','14'),
                                 tags='menu')
 
 #----------------------------------------------------------------------------------------
