@@ -310,6 +310,7 @@ class Etoile:
             nouvelleFlotte = Flotte(self,nbVaisseaux,etoileDestination)
             nouvelleFlotte.calcTravelTime()
             self.owner.listeFlotteEnMouvement.append(nouvelleFlotte)
+            self.flotteStationnaire.nbVaisseaux -= nbVaisseaux
             print("flotte avec du peuple")
         else:
             print("flotte nulle")
@@ -326,16 +327,18 @@ class Etoile:
         self.flotteStationnaire += nbUsine
 
     def getNbVaisseau(self):
-        if(self.spyRank == 0 or self.spyRank == 1 or self.spyRank == 2):
-            return self.flotteAuDernierPassage
-        elif(isinstance(owner,Humain) or self.spyRank == 3):
+        if(isinstance(owner,Humain) or self.spyRank == 3):
             return self.flotteStationnaire.nbVaisseaux
+        elif(self.spyRank == 0 or self.spyRank == 1 or self.spyRank == 2):
+            return self.flotteAuDernierPassage
+        
 
     def getNbUsine(self):
+        if(isinstance(owner,Humain) or self.spyRank == 2 or self.spyRank == 3):
+            return self.nbUsine
         if(self.spyRank == 0 or self.spyRank == 1):
             return -1
-        elif(self.spyRank == 2 or self.spyRank == 3 or isinstance(owner,Humain)):
-            return self.nbUsine
+        
 
     def gotTakenBy(self,newOwner):
         self.owner = newOwner
