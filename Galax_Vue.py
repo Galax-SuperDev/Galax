@@ -80,12 +80,14 @@ class Vue:
         self.drawMainMenu()
         
     def normPosX(self,position): #fuckage ici!
-        pos = int((position*self.width)/32)+32
-        return pos
+        return position*32
+        """pos = int((position*self.width)/32)+32
+        return pos"""
     
     def normPosY(self,position):
-        pos = int((position*self.height)/20)+32
-        return pos
+        return position*32
+        """pos = int((position*self.height)/20)+32
+        return pos"""
     
     def choixNbrEtoiles(self):
         self.nbrEtoiles = 0
