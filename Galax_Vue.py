@@ -5,6 +5,7 @@ import time
 
 class Vue:
     def __init__(self,controlleur):
+        self.compteurEtoile = 0
         self.controlleur = controlleur
         self.factionVaincue=''
         self.listeEtoiles=[]
@@ -304,13 +305,16 @@ class Vue:
             posX = self.normPosX(e.posX)
             posY = self.normPosY(e.posY)
             if(e.nom == "Czin"):
-                self.canvas.create_image(posX, posY, image=self.imagesOmbre[0].image, anchor=NW,tags="etoile")
+                self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[0].image, anchor=NW,tags="etoile")
             if(e.nom == "Gubru"):
-                self.canvas.create_image(posX, posY, image=self.imagesOmbre[1].image, anchor=NW,tags="etoile")
+                self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[1].image, anchor=NW,tags="etoile")
             if(e.nom == "Humain"):
-                self.canvas.create_image(posX, posY, image=self.imagesOmbre[2].image, anchor=NW,tags="etoile")
+                self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[2].image, anchor=NW,tags="etoile")
 
             self.canvas.create_image(posX, posY, image=self.imagesPlanete[random.randint(0,7)].image, anchor=NW,tags="etoile")
+            self.compteurEtoile += 1
+        print(self.compteurEtoile)
+
 
             
     def drawNomEtoile(self,etoile):

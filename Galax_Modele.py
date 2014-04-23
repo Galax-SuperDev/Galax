@@ -8,17 +8,22 @@ class Jeu:
     def __init__(self,nbEtoilesTotales=50):
         nbEtoileNeutre = nbEtoilesTotales #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
         print("Le nombre d'etoile est set a la 9eme ligne du modele a " + str(nbEtoileNeutre))
+        self.compteurEtoile = 0
         self.listeFaction = []
         self.listeFaction.append(Humain(self))
         self.listeFaction.append(Gubru(self))
         self.listeFaction.append(Czin(self))
         self.listeFaction.append(Neutral(nbEtoileNeutre,self))
         self.anneePassees = 0
+        print(self.compteurEtoile)
+        
        
     def getMergedListeEtoile(self):
         grosseListeEtoile = []
         for faction in self.listeFaction:
-            grosseListeEtoile.extend(faction.listeEtoile)
+            for etoile in faction.listeEtoile:
+                grosseListeEtoile.append(etoile)
+
         return grosseListeEtoile
     
     def ajoutVaisseau(self):
@@ -293,6 +298,7 @@ class Etoile:
         self.valeurBase = 0
         print(self.nom,end=' -> ')
         print(str(self.posX)+' '+str(self.posY))#print la position de l'etoile
+        self.owner.parent.compteurEtoile += 1
 
     def envoyerNouvelleFlotte(self,nbVaisseaux,etoileDestination):
         nouvelleFlotte = Flotte(self,nbVaisseaux,etoileDestination)
@@ -328,8 +334,8 @@ class Etoile:
 ####dans setPosition ajouter un intervalle pour ne pas que les etoiles ce chevauche ( puisqu'elle on un certain rayon)
     def setPosition(self):  #attribut une position au hasare a l'etoile en verifiant de ne pas la mettre sur une etoile existante
         while(True):        #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au return
-            posX = random.randint(0,32)
-            posY = random.randint(0,20)  
+            posX = random.randint(0,31)
+            posY = random.randint(0,19)  
             for faction in self.owner.parent.listeFaction:          #pour chaque faction dans la liste de faction
                 for etoile in faction.listeEtoile:                  #pour chaque etoile dans la liste d'etoile contenue dans chaque faction
                     if( posX==etoile.posX and posY==etoile.posY):   #si la position de l'etoile courante est egale a la position d'une autre etoile
