@@ -9,13 +9,18 @@ class Controlleur:
 
     def menuLoop(self, vueReturnKey):
         if(vueReturnKey == 0):#NewGame
-            self.jeu = Galax_Modele.Jeu()
+            if(self.vue.getNbrEtoiles() == 0):
+                self.jeu = Galax_Modele.Jeu()
+            else:
+                self.jeu = Galax_Modele.Jeu(self.vue.getNbrEtoiles())
             self.vue.setListeEtoile(self.jeu.getMergedListeEtoile())
             self.vue.drawJeu()
         elif(vueReturnKey == 1):#High scores
             pass
         elif(vueReturnKey == 2):#Quitter"
             pass
+        elif(vueReturnKey ==3): #choix du nombres d'etoiles
+            self.vue.choixNbrEtoiles()
 
     def gameLoop(self):
         jeu.gestionTroupe()

@@ -8,7 +8,7 @@ class Vue:
         self.controlleur = controlleur
         self.factionVaincue=''
         self.listeEtoiles=[]
-        
+        self.nbrEtoiles = 0
         self.etatVue = 0
 
         self.root=Tk()
@@ -81,6 +81,21 @@ class Vue:
         pos = int((position*self.height)/20)+32
         return pos
     
+    def choixNbrEtoiles(self):
+        self.nbrEtoiles = 0
+        inputNbrEtoile = Scale(self.root,from_=20, to=80,orient=HORIZONTAL)
+        inputNbrEtoile.pack()
+        def sendReponse():
+            self.nbrEtoiles = inputNbrEtoile.get()
+            inputNbrEtoile.destroy()
+            b.destroy()
+        b = Button(self.root, text="Choisir", width=10, command=sendReponse)
+        b.pack()
+
+    def getNbrEtoiles(self):
+        return self.nbrEtoiles
+
+    
     def leftClick(self,event):
         eventX = event.x
         eventY = event.y
@@ -97,6 +112,9 @@ class Vue:
                     print("button2")
                 elif(eventY >= self.buttonPosY3 and eventY <= self.buttonPosY3+self.buttonHeight):
                     print("button3")
+                elif(eventY >= self.buttonPosY4 and eventY <= self.buttonPosY4+self.buttonHeight):
+                    print("combien d'etoiles")
+                    self.choixNbrEtoiles()
         elif(self.etatVue == 1):
             for e in self.listeEtoiles:
         
@@ -322,6 +340,7 @@ class Vue:
         self.buttonPosY1 = self.screenHeight/3 
         self.buttonPosY2 = self.screenHeight/3 + self.buttonHeight + 2
         self.buttonPosY3 = self.screenHeight/3 + (self.buttonHeight*2) + 4
+        self.buttonPosY4 = self.screenHeight/3 + (self.buttonHeight*3) + 6
         
         self.canvas.delete("menu")
         
@@ -337,6 +356,10 @@ class Vue:
                                      self.buttonPosX+self.buttonWidth, self.buttonPosY1+(self.buttonHeight*3)+4,
                                      fill='gray',activefill='white',tags='menu')
         
+        self.canvas.create_rectangle(self.buttonPosX,self.buttonPosY4,
+                                     self.buttonPosX+self.buttonWidth,self.buttonPosY1+(self.buttonHeight*4)+6,
+                                     fill='gray',activefill='white',tags='menu')
+
         self.canvas.create_text(self.buttonPosX+100,self.buttonPosY1+32,
                                 text='New game',fill='black',activefill='white',
                                 font=('consolas','16'),
@@ -348,6 +371,11 @@ class Vue:
                                 tags='menu')
         self.canvas.create_text(self.buttonPosX+100,self.buttonPosY1+160,
                                 text='Quit game',
+                                fill='black',activefill='white',
+                                font=('consolas','16'),
+                                tags='menu')
+        self.canvas.create_text(self.buttonPosX+100,self.buttonPosY1+226,
+                                text='choix # Etoiles',
                                 fill='black',activefill='white',
                                 font=('consolas','16'),
                                 tags='menu')
