@@ -280,7 +280,20 @@ class Vue:
         for e in self.listeEtoiles:
             posX = self.normPosX(e.posX)
             posY = self.normPosY(e.posY)
+            if(e.nom == "Czin"):
+                self.canvas.create_image(posX, posY, image=self.imagesOmbre[0].image, anchor=NW,tags="etoile")
+            if(e.nom == "Gubru"):
+                self.canvas.create_image(posX, posY, image=self.imagesOmbre[1].image, anchor=NW,tags="etoile")
+            if(e.nom == "Humain"):
+                self.canvas.create_image(posX, posY, image=self.imagesOmbre[2].image, anchor=NW,tags="etoile")
+
             self.canvas.create_image(posX, posY, image=self.imagesPlanete[random.randint(0,7)].image, anchor=NW,tags="etoile")
+
+            self.imagesOmbre = []
+            for i in range(3):
+                self.imagesOmbre.append(PngImageTk("ombre"+str(i)+".png"))
+                self.imagesOmbre[i].convert()
+
             
     def drawNomEtoile(self,etoile):
         self.canvas.create_text(self.screenWidth-220,74,anchor=NW,
