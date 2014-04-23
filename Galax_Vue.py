@@ -160,8 +160,8 @@ class Vue:
                                                 font=('consolas','12'),
                                                 tags='menu')
                         self.sliderFlottes()
-                        self.drawNomEtoile(e)
-
+                        self.canvas.delete('menu')
+                        self.drawInfosEtoileOrigin(self.etoileOrigin)
                         
     def rightClick(self,event):
         eventX = event.x
@@ -206,8 +206,9 @@ class Vue:
                                                 text="nom de l'etoile",fill='white',
                                                 font=('consolas','12'),
                                                 tags='menu')
-                        
-                        self.drawNomEtoile(e)
+                        self.canvas.delete('menu')
+                        self.drawInfosEtoileOrigin(self.etoileOrigin)
+                        self.drawInfosEtoileDestination(self.etoileDestination)
         
                         
     '''
@@ -299,11 +300,84 @@ class Vue:
 
 
             
-    def drawNomEtoile(self,etoile):
+    def drawInfosEtoileOrigin(self,etoile):  
+             
+        self.canvas.create_text(self.screenWidth-220,58,anchor=NW,
+                text="owner:"+str(etoile.owner.nom),fill='white',
+                font=('consolas','10'),
+                tags='menu')
+        
         self.canvas.create_text(self.screenWidth-220,74,anchor=NW,
-                        text=etoile.nom,fill='white',
-                        font=('consolas','12'),
+                        text="nom de l'etoile:",fill='white',
+                        font=('consolas','10'),
                         tags='menu')
+        
+        self.canvas.create_text(self.screenWidth-220,90,anchor=NW,
+                        text=etoile.nom,fill='white',
+                        font=('consolas','10'),
+                        tags='menu')
+
+        self.canvas.create_text(self.screenWidth-220,106,anchor=NW,
+                text="x:"+str(etoile.posX)+" y:"+str(etoile.posY),fill='white',
+                font=('consolas','10'),
+                tags='menu')
+        
+        self.canvas.create_text(self.screenWidth-220,122,anchor=NW,
+                text="spy rank:"+str(etoile.spyRank),fill='white',
+                font=('consolas','10'),
+                tags='menu')
+        
+        self.canvas.create_text(self.screenWidth-220,138,anchor=NW,
+                text="nombre d'usines:"+str(etoile.nbUsine),fill='white',
+                font=('consolas','10'),
+                tags='menu')
+        
+        self.canvas.create_text(self.screenWidth-220,138,anchor=NW,
+                text="nombre d'usines:"+str(etoile.nbUsine),fill='white',
+                font=('consolas','10'),
+                tags='menu')
+        
+        self.canvas.create_text(self.screenWidth-220,154,anchor=NW,
+                text="vaisseaux:"+str(etoile.flotteStationnaire.nbVaisseaux),fill='white',
+                font=('consolas','10'),
+                tags='menu')
+        
+    def drawInfosEtoileDestination(self,etoile): 
+             
+        self.canvas.create_text(self.screenWidth-220,202,anchor=NW,
+                text="owner:"+str(etoile.owner.nom),fill='white',
+                font=('consolas','10'),
+                tags='menu')
+        
+        self.canvas.create_text(self.screenWidth-220,218,anchor=NW,
+                        text="nom de l'etoile:",fill='white',
+                        font=('consolas','10'),
+                        tags='menu')
+        
+        self.canvas.create_text(self.screenWidth-220,234,anchor=NW,
+                        text=etoile.nom,fill='white',
+                        font=('consolas','10'),
+                        tags='menu')
+
+        self.canvas.create_text(self.screenWidth-220,250,anchor=NW,
+                text="x:"+str(etoile.posX)+" y:"+str(etoile.posY),fill='white',
+                font=('consolas','10'),
+                tags='menu')
+        
+        self.canvas.create_text(self.screenWidth-220,266,anchor=NW,
+                text="spy rank:"+str(etoile.spyRank),fill='white',
+                font=('consolas','10'),
+                tags='menu')
+        
+        self.canvas.create_text(self.screenWidth-220,282,anchor=NW,
+                text="nombre d'usines:"+str(etoile.getNbUsine()),fill='white',
+                font=('consolas','10'),
+                tags='menu')
+        
+        self.canvas.create_text(self.screenWidth-220,298,anchor=NW,
+                text="vaisseaux:"+str(etoile.getNbVaisseau()),fill='white',
+                font=('consolas','10'),
+                tags='menu')   
         
 
             
