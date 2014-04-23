@@ -40,15 +40,17 @@ class Jeu:
         for faction in self.listeFaction:
             for flotte in faction.listeFlotteEnMouvement:
                 if(flotte.estRendu()):
-                    flotte.isMoving=False
                     if(flotte.owner == flotte.destination.owner):#si c'est la meme faction
-                        flotte.destination.mergeFlotte(flotte)
+                        flotte.destination.flotteStationnaire.mergeFlotte(flotte)
+                        print("Flotte:"+str(flotte.nbVaisseaux)+" merge avec la flotte de l'etoile:"+str(flotte.destination.nom))
                     else:                                                 #Sinon, c'est la bataille!
                         gagnant = flotte.bataille()
                         if(gagnant == faction):                    #si c'est l'attaquant qui a gagne la bataille
+                            print("Les:"+str(gagnant.nom)+" on capturer:"+str(flotte.destination.nom)+" aux mains des:"+str(flotte.destination.owner.nom))
                             flotte.destination.flotteStationnaire = Flotte(gagnant,flotte.nbVaisseaux,None)
                             gagnant.changeEtoileOwner(flotte.destination.owner,flotte.destination)
                         else:                                               #si les defenseurs ont gagne la bataille
+                            print("Les:"+str(flotte.destination.owner.nom)+" on defendu la planete:"+str(flotte.destination.owner.nom))
                             pass
                         aSupprimer.append(Flotte)
                 else:
@@ -373,7 +375,7 @@ class Flotte:
         self.depart = etoileDepart
         self.destination = etoileDestination
 
-    def mergeFlotte(laFlotteAnnexe):
+    def mergeFlotte(self,laFlotteAnnexe):
         self.nbVaisseaux += laFlotteAnnexe.nbVaisseaux
 
     def calcTravelTime(self):
