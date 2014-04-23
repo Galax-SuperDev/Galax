@@ -8,7 +8,7 @@ class Vue:
         self.compteurEtoile = 0
         self.controlleur = controlleur
         self.factionVaincue=''
-        self.listeEtoiles=[]
+        self.listeEtoiles = []
         self.nbrEtoiles = 0
         self.etatVue = 0
 
@@ -181,33 +181,34 @@ class Vue:
                     
                     self.etoileDestination = e
                     
-                    oriX = self.normPosX(self.etoileOrigin.posX)+16
-                    oriY = self.normPosY(self.etoileOrigin.posY)+16
-                    
-                    destX = self.normPosX(self.etoileDestination.posX)+16
-                    destY = self.normPosY(self.etoileDestination.posY)+16
-                    
-                    cursorX = posX+16
-                    cursorY = posY+16
-                    
-                    
-                    self.canvas.delete('cursorDest')
-                    self.canvas.create_image(cursorX, cursorY, 
-                                             image=self.imageCursorDestination.image, 
-                                             anchor=CENTER,tags='cursorDest')
+                    if(self.controlleur.isHumanMovePossible(self.etoileOrigin)):
+                        oriX = self.normPosX(self.etoileOrigin.posX)+16
+                        oriY = self.normPosY(self.etoileOrigin.posY)+16
+                        
+                        destX = self.normPosX(self.etoileDestination.posX)+16
+                        destY = self.normPosY(self.etoileDestination.posY)+16
+                        
+                        cursorX = posX+16
+                        cursorY = posY+16
+                        
+                        
+                        self.canvas.delete('cursorDest')
+                        self.canvas.create_image(cursorX, cursorY, 
+                                                 image=self.imageCursorDestination.image, 
+                                                 anchor=CENTER,tags='cursorDest')
 
-                    self.canvas.delete('trajet')
-                    self.canvas.create_line(oriX,oriY,
-                                            destX,destY,fill='white',tags='trajet')
-                    
-                    self.canvas.delete('menu')
-                    
-                    self.canvas.create_text(self.screenWidth-220,57,anchor=NW,
-                                            text="nom de l'etoile",fill='white',
-                                            font=('consolas','12'),
-                                            tags='menu')
-                    
-                    self.drawNomEtoile(e)
+                        self.canvas.delete('trajet')
+                        self.canvas.create_line(oriX,oriY,
+                                                destX,destY,fill='white',tags='trajet')
+                        
+                        self.canvas.delete('menu')
+                        
+                        self.canvas.create_text(self.screenWidth-220,57,anchor=NW,
+                                                text="nom de l'etoile",fill='white',
+                                                font=('consolas','12'),
+                                                tags='menu')
+                        
+                        self.drawNomEtoile(e)
                     
     def mouseDragged(self,event):
         eventX = event.x
@@ -251,9 +252,10 @@ class Vue:
     def setListeEtoile(self,listeEtoile):
         self.listeEtoiles = listeEtoile
         
-    def drawJeu(self):
+    def drawJeu(self,listeEtoiles):
+        self.setListeEtoile(listeEtoiles)
         self.canvas.delete('all')
-        self.drawEtoiles()
+        self.drawEtoiles(listeEtoiles)
         self.drawBottomMenu()
         self.drawSideMenu()
         
@@ -301,9 +303,9 @@ class Vue:
                                      tags='addFlotteButton')
         
 
-    def drawEtoiles(self):
+    def drawEtoiles(self,listeEtoiles):
         self.canvas.create_image(0,0,image=self.background,anchor=NW)
-        for e in self.listeEtoiles:
+        for e in listeEtoiles:
             posX = self.normPosX(e.posX)
             posY = self.normPosY(e.posY)
             if(e.owner.nom == "Czin"):

@@ -13,12 +13,11 @@ class Controlleur:
                 self.jeu = Galax_Modele.Jeu()
             else:
                 self.jeu = Galax_Modele.Jeu(self.vue.getNbrEtoiles())
-            self.vue.setListeEtoile(self.jeu.getMergedListeEtoile())
-            self.vue.drawJeu()
+            self.vue.drawJeu(self.jeu.getMergedListeEtoile())
         elif(vueReturnKey == 1):#High scores
-            pass
+            print("pasEncore implementer")
         elif(vueReturnKey == 2):#Quitter"
-            pass
+            self.vue.root.destroy()
         elif(vueReturnKey ==3): #choix du nombres d'etoiles
             self.vue.choixNbrEtoiles()
 
@@ -28,15 +27,25 @@ class Controlleur:
             self.jeu.moveFlotteEnMouvement()
         self.jeu.ajoutVaisseau()
         self.jeu.anneePassees +=1
-        if(jeu.faction[0].isDead()):
+        if(jeu.listeFaction[0].isDead()):
             vue.drawFinPartie(False)
-        if(jeu.faction[1].isDead() and jeu.faction[1].isDead()):
+        if(jeu.listeFaction[1].isDead() and jeu.listeFaction[1].isDead()):
             vue.drawFinPartie(True)
             vue.drawMainMenu()
-        if(jeu.faction[1].isDead()):
+        if(jeu.listeFaction[1].isDead()):
             vue.setFactionVaincue(True)
-        if(jeu.faction[1].isDead()):
+        if(jeu.listeFaction[1].isDead()):
             vue.setFactionVaincue(False)
+        self.vue.drawJeu(self.jeu.getMergedListeEtoile())
+
+    def launchPress(self,etoileDepart,etoileDestination):
+        self.jeu.lancerFlotte(etoileDepart,etoileDestination)
+
+    def isHumanMovePossible(self,etoileDepart):
+        if(isinstance(etoileDepart.owner,Galax_Modele.Humain)):
+            return True
+        return False
+
             
 
 if __name__ == '__main__':

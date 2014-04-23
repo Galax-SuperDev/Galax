@@ -59,6 +59,9 @@ class Jeu:
         for itemSupprimable in uneListeSupprimable:
             del itemSupprimable
 
+    def lancerFlotteHumain(self,etoileDepart,etoileDestination,force):
+    	etoileDepart.envoyerNouvelleFlotte(force,etoileDestination)
+
 
 
 
