@@ -225,41 +225,49 @@ class Gubru(Faction):
         self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None,None)
         self.nbr_vaisseau_par_attaque = 5
         self.force_attaque_basique = 10
-
-    def formationFlotte():
-        if (self.parent.anneesPassees > 0):
-            self.force_attaque = self.parent.anneesPassees * (self.nbr_vaisseau_par_attaque + self.force_attaque_basique)
-        else:
-            self.force_attaque = force_attaque_basique * 2
-
-        while(self.listeEtoile[0].nbVaisseaux >= force_attaque + self.force_attaque_basique ):
-            self.listeEtoile[0].envoyerNouvelleFlotte(self.force_attaque,trouverEtoilePlusPres(self.listeEtoile[0]))
-########voir les explications dans le commit nomme "Changement majeur dans la gestion des platetes - ajout fn"
-
+        self.force_attaque = 0
 
     def trouverEtoilePlusPres(self,etoileDeBase):
         self.etoilePlusPres = None
         self.distance = 0
-        self.distancePlusPres = 0
+        self.distancePlusPres = 1000
+        listeEtoileDejaEnvoi = []
 
         for faction in self.parent.listeFaction: #pour chaque faction
-            if (faction.nom != "Gubru"): # qui ne sont pas Gubru
+            if (faction.nom != 'Gubru'): # qui ne sont pas Gubru
                 for etoile in faction.listeEtoile: # on regarde a travers toutes les etoiles
-                    distance = math.sqrt((etoile.posX- self.listeEtoile[0].posX)**2+(etoile.posY- self.listeEtoile[0].posY)**2) #on etabli la distance
-                    if(distance <= distancePlusPres and self.listeEtoile[0].listeFlotteEnMouvement.destination != etoile): # regarde la plus proche qui n'est PAS deja une cible
+                    self.distance = math.sqrt((etoile.posX- self.listeEtoile[0].posX)**2+(etoile.posY- self.listeEtoile[0].posY)**2) #on etabli la distance
+                    if(self.distance <= self.distancePlusPres):
+                        for etoiles in listeEtoileDejaEnvoi:
+                            if(etoiles.nom == self.etoilePlusPres.nom): # regarde la plus proche qui n'est PAS deja une cible
+                                print("etoiles deja attaquer")
+                                break
                         self.etoilePlusPres = etoile # on a trouver l'etoile la plus pres
+                        listeEtoileDejaEnvoi.append(etoile)
+                        print("trouver etoile plus proche")
                     else:
                         print("il n'y a plus de cibles potentielles")
 
         return self.etoilePlusPres
 
+    def formationFlotte(self):
+        if (self.parent.anneePassees > 0):
+            self.force_attaque = self.parent.anneePassees * (self.nbr_vaisseau_par_attaque + self.force_attaque_basique)
+        else:
+            self.force_attaque = self.force_attaque_basique * 2
+
+        while(self.listeEtoile[0].flotteStationnaire.nbVaisseaux >= self.force_attaque + self.force_attaque_basique ):
+            self.listeEtoile[0].envoyerNouvelleFlotte(self.force_attaque,self.trouverEtoilePlusPres(self.listeEtoile[0]))
+########voir les explications dans le commit nomme "Changement majeur dans la gestion des platetes - ajout fn"
+
     def reorganisationDesFlottes(self): #cela doit etre fait a chaque tour
         for etoile in self.listeEtoile:
-            if(etoile != self.listeEtoile[0]): # on ne veux pas envoyer de flottes de l'etoile mere vers l'etoile mere
-                if (etoile.flotteStationnaire > 25):
+            if(etoile.nom != self.listeEtoile[0].nom): # on ne veux pas envoyer de flottes de l'etoile mere vers l'etoile mere
+                if (etoile.flotteStationnaire.nbVaisseaux > 25):
                     self.etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire - 15,self.listeEtoile[0])
                 else:
                     self.etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.listeEtoile[0])
+        self.formationFlotte()
 
 
 
