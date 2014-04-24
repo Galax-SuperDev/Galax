@@ -347,7 +347,7 @@ class Vue:
         if(etoile.getNbVaisseau() == -1):
             texte = "Nb Vaisseaux: - ? ? ? -"
         else:
-            texte = "Vaisseaux:"+str(etoile.getNbUsine())
+            texte = "Vaisseaux:"+str(etoile.getNbVaisseau())
         self.canvas.create_text(self.screenWidth-220,154,anchor=NW,
                 text=texte,fill='white',
                 font=('consolas','10'),
@@ -392,7 +392,7 @@ class Vue:
         if(etoile.getNbVaisseau() == -1):
             texte = "Nb Vaisseaux: - ? ? ? -"
         else:
-            texte = "Vaisseaux:"+str(etoile.getNbUsine())
+            texte = "Vaisseaux:"+str(etoile.getNbVaisseau())
         self.canvas.create_text(self.screenWidth-220,298,anchor=NW,
                 text=texte,fill='white',
                 font=('consolas','10'),
