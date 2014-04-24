@@ -40,12 +40,13 @@ class Jeu:
         for faction in self.listeFaction:
             for flotte in faction.listeFlotteEnMouvement:
                 if(flotte.estRendu()):
-                    if(flotte.owner == flotte.destination.owner):#si c'est la meme faction
+                    print("Une flotte de:"+str(flotte.nbVaisseaux)+" appartenant au:"+str(flotte.owner.nom)+" est arrive sur:"+str(flotte.destination.nom))
+                    if(flotte.owner.nom == flotte.destination.owner.nom):#si c'est la meme faction
                         flotte.destination.flotteStationnaire.mergeFlotte(flotte)
                         print("Flotte:"+str(flotte.nbVaisseaux)+" merge avec la flotte de l'etoile:"+str(flotte.destination.nom))
                     else:                                                 #Sinon, c'est la bataille!
                         gagnant = flotte.bataille()
-                        if(gagnant == faction):                    #si c'est l'attaquant qui a gagne la bataille
+                        if(gagnant.nom == faction.nom):                    #si c'est l'attaquant qui a gagne la bataille
                             print("Les:"+str(gagnant.nom)+" on capturer:"+str(flotte.destination.nom)+" aux mains des:"+str(flotte.destination.owner.nom))
                             flotte.destination.flotteStationnaire = Flotte(gagnant,flotte.nbVaisseaux,None)
                             gagnant.changeEtoileOwner(flotte.destination.owner,flotte.destination)
@@ -79,12 +80,15 @@ class Faction:
         self.parent = parent
 
     def isDead(self):
-        if(len(self.listeEtoile) == 0 and self.listeFlotteEnMouvement == 0):
+        if(len(self.listeEtoile) == 0 and len(self.listeFlotteEnMouvement) == 0):
             return True
 
     def changeEtoileOwner(self,oldOwner,etoileCapturer):
         etoileCapturer.gotTakenBy(self)
         self.listeEtoile.append(oldOwner.listeEtoile.pop(oldOwner.listeEtoile.index(etoileCapturer)))
+
+    def getDistance(self,A,B):
+        return math.sqrt((B.posX-A.posX)**2+(B.posY-A.posY)**2)
 
 
 class Humain(Faction):
@@ -123,7 +127,7 @@ class Czin(Faction):
     def reorganisationDesFlottes(self):
         if(self.mode == self.mode_etablir_base):
             if(self.flotteArrive()):
-                if(self.etoileBaseProspective.owner == self):#si la baseProspective est en possession des Czins
+                if(self.etoileBaseProspective.owner.nom == self.nom):#si la baseProspective est en possession des Czins
                     self.etoileBase = self.etoileBaseProspective
                     self.conquerirGrappe()
                     self.mode = self.mode_conquerir_grappe
@@ -156,15 +160,17 @@ class Czin(Faction):
 
     def choisirBase(self):
         etoileRetour = None
-        for etoile in self.listeEtoile:
-            if(etoileRetour == None):
-                etoileRetour = etoile
-            if(etoile.valeurGrappe == 0):
-                etoile.valeurBase = 0
-            else:
-                etoile.valeurBase = etoile.valeurGrappe-3*self.getDistance(self.etoileBase,etoile)
-                if(etoile.valeurBase > etoileRetour.valeurBase):
+        grosseListeEtoile = self.parent.getMergedListeEtoile()
+        for etoile in grosseListeEtoile:
+            if(not isinstance(etoile.owner,Czin)):
+                if(etoileRetour == None):
                     etoileRetour = etoile
+                if(etoile.valeurGrappe == 0):
+                    etoile.valeurBase = 0
+                else:
+                    etoile.valeurBase = etoile.valeurGrappe-3*self.getDistance(self.etoileBase,etoile)
+                    if(etoile.valeurBase > etoileRetour.valeurBase):
+                        etoileRetour = etoile
         return etoileRetour
 
     def conquerirGrappe(self):
@@ -187,7 +193,7 @@ class Czin(Faction):
                                     etoilePlusProche = etoile
                                 else:
                                     for etoileDejaEnvoi in listeEtoileDejaEnvoi:
-                                        if(etoileDejaEnvoi == etoile):
+                                        if(etoileDejaEnvoi.nom == etoile.nom):
                                             break
                                     else:
                                         etoilePlusProche = etoile
@@ -209,9 +215,6 @@ class Czin(Faction):
                         if(distance <= self.distanceGrappe):
                             s = self.distanceGrappe - distance + 1
                             A.valeurGrappe = s*s
-
-    def getDistance(self,A,B):
-        return math.sqrt((B.posX-A.posX)**2+(B.posY-A.posY)**2)
 
 
 
@@ -313,7 +316,7 @@ class Etoile:
             nouvelleFlotte.calcTravelTime()
             self.owner.listeFlotteEnMouvement.append(nouvelleFlotte)
             self.flotteStationnaire.nbVaisseaux -= nbVaisseaux
-            print("flotte avec du peuple")
+            print(str(self.owner.nom) + " --> Flotte:" + str(nbVaisseaux) + ", Depart:" + str(self.nom) + ", Destination:" + str(etoileDestination.nom))
         else:
             print("flotte nulle")
 
