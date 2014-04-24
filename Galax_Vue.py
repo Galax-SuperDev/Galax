@@ -301,13 +301,10 @@ class Vue:
             posY = self.normPosY(e.posY)
             if(e.owner.nom == "Czin"):
                 self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[0].image, anchor=NW,tags="etoile")
-                print("dessin d'une etoile Czin")
             if(e.owner.nom == "Gubru"):
                 self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[1].image, anchor=NW,tags="etoile")
-                print("dessin d'une etoile Gubru")
             if(e.owner.nom == "Humain"):
                 self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[2].image, anchor=NW,tags="etoile")
-                print("dessin d'une etoile Humain")
             if(len(listeEtoiles) >= len(self.listeIndexSkinEtoile)):
                 print(str(len(listeEtoiles))+"/"+str(len(self.listeIndexSkinEtoile)))
                 self.listeIndexSkinEtoile.append(random.randint(0,7))
