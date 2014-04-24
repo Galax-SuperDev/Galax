@@ -44,7 +44,7 @@ class Jeu:
                         flotte.destination.flotteStationnaire.mergeFlotte(flotte)
                         print("Flotte:"+str(flotte.nbVaisseaux)+" merge avec la flotte de l'etoile:"+str(flotte.destination.nom))
                     else:                                                 #Sinon, c'est la bataille!
-                        flotte = flotte.bataille()
+                        uneflotte = flotte.bataille()
                         if(flotte.flagBataille == True):                    #si c'est l'attaquant qui a gagne la bataille
                             print("Les:"+str(flotte.owner.nom)+" on capturer:"+str(flotte.destination.nom)+" aux mains des:"+str(flotte.destination.owner.nom))
                             flotte.destination.flotteStationnaire = Flotte(flotte.owner,flotte.nbVaisseaux,None,None)
@@ -53,7 +53,7 @@ class Jeu:
                             print("Les:"+str(flotte.destination.owner.nom)+" on defendu la planete:"+str(flotte.destination.nom)+" contre les:"+str(flotte.owner.nom))
                             pass
                         #aSupprimer.append(Flotte)
-                        del flotte
+                    faction.listeFlotteEnMouvement.remove(flotte)
                 else:
                     flotte.updateTravelTime()
         """if(aSupprimer):
@@ -245,7 +245,6 @@ class Gubru(Faction):
                         distance = self.getDistance(etoile,etoileMere)
                         distancePlusProche = self.getDistance(etoilePlusProche,etoileMere)
                         if(distance < distancePlusProche):
-                            print(str(etoile.nom)+" est plus proche de la base Gubru que:"+etoilePlusProche.nom)
                             etoilePlusProche = etoile
         else:
             return etoilePlusProche
@@ -417,18 +416,14 @@ class Flotte:
         while(self.destination.flotteStationnaire.nbVaisseaux > 0 and self.nbVaisseaux > 0):
             if(random.randint(0,10) > 6):
                 turnValue = -1
-                print("Perte d'un vaisseau pour les",end=' ')
             else:
                 turnValue = 0
-                print("Aucune perte pour les",end=' ')
             if(tourDefence):
                 self.nbVaisseaux += turnValue
                 tourDefence = False
-                print("attaquant")
             else:
                 self.destination.flotteStationnaire.nbVaisseaux += turnValue
                 tourDefence = True
-                print("defenseur")
         else:
             if(self.destination.flotteStationnaire.nbVaisseaux == 0):
                 self.flagBataille = True
