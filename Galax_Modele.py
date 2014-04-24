@@ -178,25 +178,25 @@ class Czin(Faction):
         self.determinerGrappe()
         nbEnvoi = self.getForceAttaque()
         listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
-        etoilePlusProche = listeDeTouteLesEtoile[0]
+        etoilePlusProche = None
         listeEtoileDejaEnvoi = []
 
         while(self.etoileBase.flotteStationnaire.nbVaisseaux >= nbEnvoi):
             for etoile in listeDeTouteLesEtoile:
+                print(etoile.nom)
                 if(not isinstance(etoile.owner,Czin)):
-                    if(etoile != etoilePlusProche):
+                    if(not etoilePlusProche):
+                        etoilePlusProche = etoile
+                    else:
                         distance = self.getDistance(etoile,self.etoileBase)
                         distancePlusProche = self.getDistance(etoilePlusProche,self.etoileBase)
                         if(distance < distancePlusProche):
-                            if(distance != 0):
-                                if(not listeEtoileDejaEnvoi):
-                                    etoilePlusProche = etoile
-                                else:
-                                    for etoileDejaEnvoi in listeEtoileDejaEnvoi:
-                                        if(etoileDejaEnvoi.nom == etoile.nom):
-                                            break
-                                    else:
-                                        etoilePlusProche = etoile
+                            for etoileDejaEnvoi in listeEtoileDejaEnvoi:
+                                if(etoileDejaEnvoi.nom == etoile.nom):
+                                    break
+                            else:
+                                print(str(etoile.nom)+" est plus proche de la base Czin que:"+etoilePlusProche.nom)
+                                etoilePlusProche = etoile
 
             listeEtoileDejaEnvoi.append(etoilePlusProche)
             self.etoileBase.envoyerNouvelleFlotte(nbEnvoi,etoilePlusProche)
