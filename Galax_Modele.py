@@ -50,7 +50,7 @@ class Jeu:
                             flotte.destination.flotteStationnaire = Flotte(flotte.owner,flotte.nbVaisseaux,None,None)
                             flotte.owner.changeEtoileOwner(flotte.destination.owner,flotte.destination)
                         else:                                               #si les defenseurs ont gagne la bataille
-                            print("Les:"+str(flotte.destination.owner.nom)+" on defendu la planete:"+str(flotte.destination.nom)+" contre les:"+str(flotte.owner))
+                            print("Les:"+str(flotte.destination.owner.nom)+" on defendu la planete:"+str(flotte.destination.nom)+" contre les:"+str(flotte.owner.nom))
                             pass
                         #aSupprimer.append(Flotte)
                         del flotte
@@ -265,9 +265,9 @@ class Gubru(Faction):
         for etoile in self.listeEtoile:
             if(etoile.nom != self.listeEtoile[0].nom): # on ne veux pas envoyer de flottes de l'etoile mere vers l'etoile mere
                 if (etoile.flotteStationnaire.nbVaisseaux > 25):
-                    self.etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire - 15,self.listeEtoile[0])
+                    etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire.nbVaisseaux - 15,self.listeEtoile[0])
                 else:
-                    self.etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire,self.listeEtoile[0])
+                    etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire.nbVaisseaux,self.listeEtoile[0])
         self.formationFlotte()
 
 
