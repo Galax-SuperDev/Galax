@@ -303,7 +303,6 @@ class Vue:
             if(e.owner.nom == "Humain"):
                 self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[2].image, anchor=NW,tags="etoile")
             if(len(listeEtoiles) >= len(self.listeIndexSkinEtoile)):
-                print(str(len(listeEtoiles))+"/"+str(len(self.listeIndexSkinEtoile)))
                 self.listeIndexSkinEtoile.append(random.randint(0,7))
             self.canvas.create_image(posX, posY, image=self.imagesPlanete[self.listeIndexSkinEtoile[i]].image, anchor=NW,tags="etoile")
 
@@ -341,7 +340,7 @@ class Vue:
         else:
             texte = "Nombre d'usines:"+str(etoile.getNbUsine())
         self.canvas.create_text(self.screenWidth-220,138,anchor=NW,
-                text="Nombre d'usines:"+texte,fill='white',
+                text=texte,fill='white',
                 font=('consolas','10'),
                 tags='menu')
 

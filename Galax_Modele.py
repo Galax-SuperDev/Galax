@@ -7,7 +7,6 @@ import math
 class Jeu:
     def __init__(self,nbEtoilesTotales=50):
         nbEtoileNeutre = nbEtoilesTotales #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
-        print("Le nombre d'etoile est set a la 9eme ligne du modele a " + str(nbEtoileNeutre))
         self.compteurEtoile = 0
         self.listeFaction = []
         self.listeFaction.append(Humain(self))
@@ -89,6 +88,12 @@ class Faction:
 
     def getDistance(self,A,B):
         return math.sqrt((B.posX-A.posX)**2+(B.posY-A.posY)**2)
+
+    def flotteEnRouteVers(self,etoileSujet):
+        for flotte in self.listeFlotteEnMouvement:
+            if(flotte.destination.nom == etoileSujet.nom):
+                return True
+        return False
 
 
 class Humain(Faction):
@@ -179,27 +184,20 @@ class Czin(Faction):
         nbEnvoi = self.getForceAttaque()
         listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
         etoilePlusProche = None
-        listeEtoileDejaEnvoi = []
 
         while(self.etoileBase.flotteStationnaire.nbVaisseaux >= nbEnvoi):
             for etoile in listeDeTouteLesEtoile:
-                print(etoile.nom)
                 if(not isinstance(etoile.owner,Czin)):
-                    if(not etoilePlusProche):
-                        etoilePlusProche = etoile
-                    else:
-                        distance = self.getDistance(etoile,self.etoileBase)
-                        distancePlusProche = self.getDistance(etoilePlusProche,self.etoileBase)
-                        if(distance < distancePlusProche):
-                            for etoileDejaEnvoi in listeEtoileDejaEnvoi:
-                                if(etoileDejaEnvoi.nom == etoile.nom):
-                                    break
-                            else:
-                                print(str(etoile.nom)+" est plus proche de la base Czin que:"+etoilePlusProche.nom)
+                    if(flotteEnRouteVers(etoile)):
+                        if(not etoilePlusProche):
+                            etoilePlusProche = etoile
+                        else:
+                            distance = self.getDistance(etoile,self.etoileBase)
+                            distancePlusProche = self.getDistance(etoilePlusProche,self.etoileBase)
+                            if(distance < distancePlusProche):
                                 etoilePlusProche = etoile
-
-            listeEtoileDejaEnvoi.append(etoilePlusProche)
-            self.etoileBase.envoyerNouvelleFlotte(nbEnvoi,etoilePlusProche)
+            else:
+                self.etoileBase.envoyerNouvelleFlotte(nbEnvoi,etoilePlusProche)
 
     def initialiserValeurGrappe(self):
         for faction in self.parent.listeFaction:
@@ -231,36 +229,25 @@ class Gubru(Faction):
         self.force_attaque = 0
 
 
-    def isAlreadySent(self,etoile):
-        listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
-        for etoiles in listeDeTouteLesEtoile:
-            if(etoiles.nom == etoile.nom):
-                return True
-        return False
-
     def trouverEtoilePlusPres(self,etoileMere):
-        etoilePlusPres = None
-        distance = 0
-        distancePlusPres = 1000
+        distance = None
+        distancePlusProche = None
         listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
         etoilePlusProche = None
 
         for etoile in listeDeTouteLesEtoile:
-            print(etoile.nom)
-            if(self.isAlreadySent(etoile)):
-                if(not isinstance(etoile.owner,Gubru)):
+            if(not isinstance(etoile.owner,Gubru)):
+                if(not self.flotteEnRouteVers(etoile)):
                     if(not etoilePlusProche):
                         etoilePlusProche = etoile
                     else:
                         distance = self.getDistance(etoile,etoileMere)
                         distancePlusProche = self.getDistance(etoilePlusProche,etoileMere)
                         if(distance < distancePlusProche):
-                            if(etoilePlusProche.nom == etoile.nom):
-                                break
-                            else:
-                                print(str(etoile.nom)+" est plus proche de la base Gubru que:"+etoilePlusProche.nom)
-                                etoilePlusProche = etoile
-        return etoilePlusProche
+                            print(str(etoile.nom)+" est plus proche de la base Gubru que:"+etoilePlusProche.nom)
+                            etoilePlusProche = etoile
+        else:
+            return etoilePlusProche
 
 
     def formationFlotte(self):
@@ -334,7 +321,7 @@ class Etoile:
             nouvelleFlotte.calcTravelTime()
             self.owner.listeFlotteEnMouvement.append(nouvelleFlotte)
             self.flotteStationnaire.nbVaisseaux -= nbVaisseaux
-            print(str(self.owner.nom) + " --> Flotte:" + str(nbVaisseaux) + ", Depart:" + str(self.nom) + ", Destination:" + str(etoileDestination.nom))
+            print(str(self.owner.nom) + " --------------------------------> Flotte:" + str(nbVaisseaux) + ", Depart:" + str(self.nom) + ", Destination:" + str(etoileDestination.nom))
         else:
             print("flotte nulle")
 
