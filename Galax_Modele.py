@@ -230,30 +230,36 @@ class Gubru(Faction):
         self.force_attaque_basique = 10
         self.force_attaque = 0
 
+
+    def isAlreadySent(self,etoile):
+        listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
+        for etoiles in listeDeTouteLesEtoile:
+            if(etoiles.nom == etoile.nom):
+                return True
+        return False
+
     def trouverEtoilePlusPres(self,etoileMere):
         etoilePlusPres = None
         distance = 0
         distancePlusPres = 1000
-        listeEtoileDejaEnvoi = []
         listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
-        etoilePlusProche = listeDeTouteLesEtoile[0]
+        etoilePlusProche = None
 
         for etoile in listeDeTouteLesEtoile:
-            if(not isinstance(etoile.owner,Gubru)):
-                if(etoile.nom != etoilePlusProche.nom ):
-                    distance = self.getDistance(etoile,etoileMere)
-                    distancePlusProche = self.getDistance(etoilePlusProche,etoileMere)
-                    if(distance < distancePlusProche):
-                        if(distance != 0):
-                            if(not listeEtoileDejaEnvoi):
-                                etoilePlusProche = etoile
-                                listeEtoileDejaEnvoi.append(etoilePlusProche)
+            print(etoile.nom)
+            if(self.isAlreadySent(etoile)):
+                if(not isinstance(etoile.owner,Gubru)):
+                    if(not etoilePlusProche):
+                        etoilePlusProche = etoile
+                    else:
+                        distance = self.getDistance(etoile,etoileMere)
+                        distancePlusProche = self.getDistance(etoilePlusProche,etoileMere)
+                        if(distance < distancePlusProche):
+                            if(etoilePlusProche.nom == etoile.nom):
+                                break
                             else:
-                                for etoileDejaEnvoi in listeEtoileDejaEnvoi:
-                                    if(etoileDejaEnvoi.nom is not etoile.nom):
-                                        etoilePlusProche = etoile
-                                        listeEtoileDejaEnvoi.append(etoilePlusProche)
-                                        
+                                print(str(etoile.nom)+" est plus proche de la base Gubru que:"+etoilePlusProche.nom)
+                                etoilePlusProche = etoile
         return etoilePlusProche
 
 
