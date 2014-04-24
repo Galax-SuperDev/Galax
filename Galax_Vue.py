@@ -149,7 +149,6 @@ class Vue:
                         self.canvas.delete('cursorDest')
                         self.canvas.delete('trajet')
                         if(self.b_launchDansCanvas != None):
-                            print("deleteMenu")
                             self.canvas.delete('slider')
                             self.canvas.delete('launcher')
                         
@@ -266,7 +265,6 @@ class Vue:
 
     def boutonLaunch(self):
         if(self.controlleur.isHumanMovePossible(self.etoileOrigin) and self.etoileDestination):
-            print("dans launchButton")
             boutonLaunch = Button(self.root,text="LAUNCH!",
                                      command= self.actionBoutonLaunch)
             self.b_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunch,tags='launcher')
@@ -283,7 +281,6 @@ class Vue:
         # dessin du slider de gestion des flottes --------------------------------------
     def sliderFlottes(self): 
         if(self.controlleur.isHumanMovePossible(self.etoileOrigin)):
-            print("dans sliderFlottes")
             self.slider = Scale(self.root,from_=0,to=int(self.etoileOrigin.flotteStationnaire.nbVaisseaux),
                             orient=HORIZONTAL,label="Nombres de vaisseaux a envoyer",
                             bg='gray40',length=300)
