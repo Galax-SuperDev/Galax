@@ -6,7 +6,7 @@ import math
 #######################################################
 class Jeu:
     def __init__(self,nbEtoilesTotales=50):
-        nbEtoileNeutre = nbEtoilesTotales #Ceci est hardcoder mais on pourait le passer au constructeur a partir du menu principal
+        nbEtoileNeutre = nbEtoilesTotales
         self.compteurEtoile = 0
         self.listeFaction = []
         self.listeFaction.append(Humain(self))
@@ -35,7 +35,7 @@ class Jeu:
         self.listeFaction[2].reorganisationDesFlottes() #Czin
 
     def moveFlotteEnMouvement(self):
-        aSupprimer = []
+        #aSupprimer = []
         for faction in self.listeFaction:
             for flotte in faction.listeFlotteEnMouvement:
                 if(flotte.estRendu()):
@@ -44,23 +44,24 @@ class Jeu:
                         flotte.destination.flotteStationnaire.mergeFlotte(flotte)
                         print("Flotte:"+str(flotte.nbVaisseaux)+" merge avec la flotte de l'etoile:"+str(flotte.destination.nom))
                     else:                                                 #Sinon, c'est la bataille!
-                        gagnant = flotte.bataille()
-                        if(gagnant.nom == faction.nom):                    #si c'est l'attaquant qui a gagne la bataille
-                            print("Les:"+str(gagnant.nom)+" on capturer:"+str(flotte.destination.nom)+" aux mains des:"+str(flotte.destination.owner.nom))
-                            flotte.destination.flotteStationnaire = Flotte(gagnant,flotte.nbVaisseaux,None)
-                            gagnant.changeEtoileOwner(flotte.destination.owner,flotte.destination)
+                        flotte = flotte.bataille()
+                        if(flotte.flagBataille == True):                    #si c'est l'attaquant qui a gagne la bataille
+                            print("Les:"+str(flotte.owner.nom)+" on capturer:"+str(flotte.destination.nom)+" aux mains des:"+str(flotte.destination.owner.nom))
+                            flotte.destination.flotteStationnaire = Flotte(flotte.owner,flotte.nbVaisseaux,None,None)
+                            flotte.owner.changeEtoileOwner(flotte.destination.owner,flotte.destination)
                         else:                                               #si les defenseurs ont gagne la bataille
-                            print("Les:"+str(flotte.destination.owner.nom)+" on defendu la planete:"+str(flotte.destination.owner.nom))
+                            print("Les:"+str(flotte.destination.owner.nom)+" on defendu la planete:"+str(flotte.destination.nom)+" contre les:"+str(flotte.owner))
                             pass
-                        aSupprimer.append(Flotte)
+                        #aSupprimer.append(Flotte)
+                        del flotte
                 else:
                     flotte.updateTravelTime()
-        if(aSupprimer):
+        """if(aSupprimer):
             self.supprimeurDeListe(aSupprimer)
 
     def supprimeurDeListe(self,uneListeSupprimable):
         for itemSupprimable in uneListeSupprimable:
-            del itemSupprimable
+            del itemSupprimable"""
 
     def lancerFlotteHumain(self,etoileDepart,etoileDestination,force):
     	etoileDepart.envoyerNouvelleFlotte(force,etoileDestination)
@@ -136,7 +137,7 @@ class Czin(Faction):
                     self.etoileBase = self.etoileBaseProspective
                     self.conquerirGrappe()
                     self.mode = self.mode_conquerir_grappe
-                else:                                       #sinon, Ã§a veux dire que les defenceurs ont gagne.
+                else:                                       #sinon, ÃƒÂ§a veux dire que les defenceurs ont gagne.
                     self.mode = self.mode_rassemblement_forces
                     self.etoileBase = self.listeEtoile[0]   #on remet l_etoile mere comme base
 
@@ -188,7 +189,7 @@ class Czin(Faction):
         while(self.etoileBase.flotteStationnaire.nbVaisseaux >= nbEnvoi):
             for etoile in listeDeTouteLesEtoile:
                 if(not isinstance(etoile.owner,Czin)):
-                    if(flotteEnRouteVers(etoile)):
+                    if(self.flotteEnRouteVers(etoile)):
                         if(not etoilePlusProche):
                             etoilePlusProche = etoile
                         else:
@@ -350,7 +351,7 @@ class Etoile:
     def gotTakenBy(self,newOwner):
         self.owner = newOwner
         self.flotteAuDernierPassage = 0
-####dans setPosition ajouter un intervalle pour ne pas que les etoiles ce chevauche ( puisqu'elle on un certain rayon)
+
     def setPosition(self):  #attribut une position au hasare a l'etoile en verifiant de ne pas la mettre sur une etoile existante
         while(True):        #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au return
             posX = random.randint(0,31)
@@ -361,7 +362,7 @@ class Etoile:
                         break       #fait sortir du 2e "for", qui nous ammene au second break
                 else:               #si la 2e boucle finis sans heurt
                     continue        #retourne et continue l'iteration dans le 1er "for"
-                break               #fait sortir du 1er "for", qui nous ammÃ¨ne au "while" au dessus
+                break               #fait sortir du 1er "for", qui nous ammÃƒÂ¨ne au "while" au dessus
             else:                   #si les deux boucles ont finis sans rencontrer une seule fois une etoile a la meme position que l'etoile courante
                 self.posX = posX    #attribution de la position en x
                 self.posY = posY    #attribution de la position en y
@@ -382,6 +383,7 @@ class Flotte:
         self.travelTime = 0
         self.depart = etoileDepart
         self.destination = etoileDestination
+        self.flagBataille = None
 
     def mergeFlotte(self,laFlotteAnnexe):
         self.nbVaisseaux += laFlotteAnnexe.nbVaisseaux
@@ -394,7 +396,7 @@ class Flotte:
             self.travelTime = 1+((distance-2)/3)
 
     def estRendu(self):
-        if(self.travelTime == 0):
+        if(self.travelTime <= 0):
             return True
         else:
             return False
@@ -406,14 +408,13 @@ class Flotte:
         self.destination = etoile
 
     def bataille(self):
-        nbVaisseauDefence = self.destination.flotteStationnaire.nbVaisseaux
         tourDefence = True
-        if(nbVaisseauDefence > self.nbVaisseaux):
+        if(self.destination.flotteStationnaire.nbVaisseaux > self.nbVaisseaux):
             print("Possibilite d'attaque surprise...")
-            if(self.attaqueSurprise(nbVaisseauDefence)):
+            if(self.attaqueSurprise(self.destination.flotteStationnaire.nbVaisseaux)):
                 tourDefence = False
                 print("Ahaha! Attaque surprise!!!")
-        while(nbVaisseauDefence > 0 and self.nbVaisseaux > 0):
+        while(self.destination.flotteStationnaire.nbVaisseaux > 0 and self.nbVaisseaux > 0):
             if(random.randint(0,10) > 6):
                 turnValue = -1
                 print("Perte d'un vaisseau pour les",end=' ')
@@ -425,14 +426,15 @@ class Flotte:
                 tourDefence = False
                 print("attaquant")
             else:
-                nbVaisseauDefence += turnValue
+                self.destination.flotteStationnaire.nbVaisseaux += turnValue
                 tourDefence = True
                 print("defenseur")
         else:
-            if(nbVaisseauDefence == 0):
-                return self.owner
+            if(self.destination.flotteStationnaire.nbVaisseaux == 0):
+                self.flagBataille = True
             else:
-                return self.destination.owner
+                self.flagBataille = False
+        return self
 
 
 

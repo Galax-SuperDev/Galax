@@ -24,6 +24,7 @@ class Controlleur:
     def gameLoop(self):
         self.jeu.gestionTroupes()
         for i in range(10):
+            print(i)
             self.jeu.moveFlotteEnMouvement()
         self.jeu.ajoutVaisseau()
         self.jeu.anneePassees +=1
