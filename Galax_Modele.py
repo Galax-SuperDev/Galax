@@ -132,17 +132,17 @@ class Czin(Faction):
 
     def reorganisationDesFlottes(self):
         if(self.mode == self.mode_etablir_base):
-            if(self.flotteArrive()):
+            if(not self.listeFlotteEnMouvement):
                 if(self.etoileBaseProspective.owner.nom == self.nom):#si la baseProspective est en possession des Czins
                     self.etoileBase = self.etoileBaseProspective
                     self.conquerirGrappe()
                     self.mode = self.mode_conquerir_grappe
-                else:                                       #sinon, ÃƒÂ§a veux dire que les defenceurs ont gagne.
+                else:                                       #sinon, ca veux dire que les defenceurs ont gagne.
                     self.mode = self.mode_rassemblement_forces
                     self.etoileBase = self.listeEtoile[0]   #on remet l_etoile mere comme base
 
         if(self.mode == self.mode_conquerir_grappe):
-            if(self.listeFlotteEnMouvement[len(self.listeFlotteEnMouvement)-1].estRendu()):
+            if(not self.listeFlotteEnMouvement):
                 self.mode = self.mode_rassemblement_forces
 
         if(self.mode == self.mode_rassemblement_forces):
@@ -153,13 +153,8 @@ class Czin(Faction):
             else:
                 self.rassemblementForces()
 
-    def flotteArrive(self):
-        if(self.listeFlotteEnMouvement[0].estRendu()):
-            return True
-        else:
-            return False
 
-    def rassemblementForces(self): # est-ce la fonction a mettre dans jeu.gestionTroupes?
+    def rassemblementForces(self):
         for etoile in self.listeEtoile:
             if(self.getDistance(etoile,self.etoileBase) < 6):
                 etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire.nbVaisseaux,self.etoileBase)
@@ -434,9 +429,7 @@ class Flotte:
 
 
     def attaqueSurprise(self,nbVaisseauDefence):
-        print("attaqueSurprise avant ratio")
         ratio = nbVaisseauDefence/self.nbVaisseaux
-        print("dans fonct Attaque")
         if(ratio < 5):
             P = ratio / 10
         elif(ratio < 20):
