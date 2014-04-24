@@ -230,28 +230,32 @@ class Gubru(Faction):
         self.force_attaque_basique = 10
         self.force_attaque = 0
 
-    def trouverEtoilePlusPres(self,etoileDeBase):
-        self.etoilePlusPres = None
-        self.distance = 0
-        self.distancePlusPres = 1000
+    def trouverEtoilePlusPres(self,etoileMere):
+        etoilePlusPres = None
+        distance = 0
+        distancePlusPres = 1000
         listeEtoileDejaEnvoi = []
+        listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
+        etoilePlusProche = listeDeTouteLesEtoile[0]
 
-        for faction in self.parent.listeFaction: #pour chaque faction
-            if (faction.nom != 'Gubru'): # qui ne sont pas Gubru
-                for etoile in faction.listeEtoile: # on regarde a travers toutes les etoiles
-                    self.distance = math.sqrt((etoile.posX- self.listeEtoile[0].posX)**2+(etoile.posY- self.listeEtoile[0].posY)**2) #on etabli la distance
-                    if(self.distance <= self.distancePlusPres):
-                        for etoiles in listeEtoileDejaEnvoi:
-                            if(etoiles.nom == self.etoilePlusPres.nom): # regarde la plus proche qui n'est PAS deja une cible
-                                print("etoiles deja attaquer")
-                                break
-                        self.etoilePlusPres = etoile # on a trouver l'etoile la plus pres
-                        listeEtoileDejaEnvoi.append(etoile)
-                        print("trouver etoile plus proche")
-                    else:
-                        print("il n'y a plus de cibles potentielles")
+        for etoile in listeDeTouteLesEtoile:
+            if(not isinstance(etoile.owner,Gubru)):
+                if(etoile.nom != etoilePlusProche.nom ):
+                    distance = self.getDistance(etoile,etoileMere)
+                    distancePlusProche = self.getDistance(etoilePlusProche,etoileMere)
+                    if(distance < distancePlusProche):
+                        if(distance != 0):
+                            if(not listeEtoileDejaEnvoi):
+                                etoilePlusProche = etoile
+                                listeEtoileDejaEnvoi.append(etoilePlusProche)
+                            else:
+                                for etoileDejaEnvoi in listeEtoileDejaEnvoi:
+                                    if(etoileDejaEnvoi.nom is not etoile.nom):
+                                        etoilePlusProche = etoile
+                                        listeEtoileDejaEnvoi.append(etoilePlusProche)
+                                        
+        return etoilePlusProche
 
-        return self.etoilePlusPres
 
     def formationFlotte(self):
         if (self.parent.anneePassees > 0):
@@ -390,7 +394,7 @@ class Flotte:
         self.nbVaisseaux += laFlotteAnnexe.nbVaisseaux
 
     def calcTravelTime(self):
-        distance = math.sqrt((self.destination.posX-self.depart.posX)**2+(self.destination.posY-self.depart.posY)**2)
+        distance = math.sqrt((self.depart.posX-self.destination.posX)**2+(self.depart.posY-self.destination.posY)**2)
         if(distance <= 2):
             self.travelTime = distance/2
         else:
