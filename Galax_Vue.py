@@ -312,12 +312,12 @@ class Vue:
     def drawInfosEtoileOrigin(self,etoile):  
              
         self.canvas.create_text(self.screenWidth-220,58,anchor=NW,
-                text="owner:"+str(etoile.owner.nom),fill='white',
+                text="Owner:"+str(etoile.owner.nom),fill='white',
                 font=('consolas','10'),
                 tags='menu')
         
         self.canvas.create_text(self.screenWidth-220,74,anchor=NW,
-                text="nom de l'etoile:",fill='white',
+                text="Nom de l'etoile:",fill='white',
                 font=('consolas','10'),
                 tags='menu')
         
@@ -332,29 +332,37 @@ class Vue:
                 tags='menu')
         
         self.canvas.create_text(self.screenWidth-220,122,anchor=NW,
-                text="spy rank:"+str(etoile.spyRank),fill='white',
+                text="Spy rank:"+str(etoile.spyRank),fill='white',
                 font=('consolas','10'),
                 tags='menu')
-        
+
+        if(etoile.getNbUsine() == -1):
+            texte = "Nombre d'usines: - ? ? ? -"
+        else:
+            texte = "Nombre d'usines:"+str(etoile.getNbUsine())
         self.canvas.create_text(self.screenWidth-220,138,anchor=NW,
-                text="nombre d'usines:"+str(etoile.getNbUsine()),fill='white',
+                text="Nombre d'usines:"+texte,fill='white',
                 font=('consolas','10'),
                 tags='menu')
-        
+
+        if(etoile.getNbVaisseau() == -1):
+            texte = "Nb Vaisseaux: - ? ? ? -"
+        else:
+            texte = "Vaisseaux:"+str(etoile.getNbUsine())
         self.canvas.create_text(self.screenWidth-220,154,anchor=NW,
-                text="vaisseaux:"+str(etoile.getNbVaisseau()),fill='white',
+                text=texte,fill='white',
                 font=('consolas','10'),
                 tags='menu')
         
     def drawInfosEtoileDestination(self,etoile): 
              
         self.canvas.create_text(self.screenWidth-220,202,anchor=NW,
-                text="owner:"+str(etoile.owner.nom),fill='white',
+                text="Owner:"+str(etoile.owner.nom),fill='white',
                 font=('consolas','10'),
                 tags='menu')
         
         self.canvas.create_text(self.screenWidth-220,218,anchor=NW,
-                text="nom de l'etoile:",fill='white',
+                text="Nom de l'etoile:",fill='white',
                 font=('consolas','10'),
                 tags='menu')
         
@@ -369,19 +377,21 @@ class Vue:
                 tags='menu')
         
         self.canvas.create_text(self.screenWidth-220,266,anchor=NW,
-                text="spy rank:"+str(etoile.spyRank),fill='white',
+                text="Spy rank:"+str(etoile.spyRank),fill='white',
                 font=('consolas','10'),
                 tags='menu')
+
         if(etoile.getNbUsine() == -1):
-            texte = "- ? ? ? -"
+            texte = "Nombre d'usines: - ? ? ? -"
         else:
             texte = "Nombre d'usines:"+str(etoile.getNbUsine())
         self.canvas.create_text(self.screenWidth-220,282,anchor=NW,
                 text=texte,fill='white',
                 font=('consolas','10'),
                 tags='menu')
+        
         if(etoile.getNbVaisseau() == -1):
-            texte = "- ? ? ? -"
+            texte = "Nb Vaisseaux: - ? ? ? -"
         else:
             texte = "Vaisseaux:"+str(etoile.getNbUsine())
         self.canvas.create_text(self.screenWidth-220,298,anchor=NW,

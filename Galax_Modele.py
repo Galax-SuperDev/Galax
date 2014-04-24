@@ -159,6 +159,8 @@ class Czin(Faction):
                 etoile.envoyerNouvelleFlotte(etoile.flotteStationnaire.nbVaisseaux,self.etoileBase)
 
     def choisirBase(self):
+        self.initialiserValeurGrappe()
+        self.determinerGrappe()
         etoileRetour = None
         grosseListeEtoile = self.parent.getMergedListeEtoile()
         for etoile in grosseListeEtoile:
@@ -174,8 +176,6 @@ class Czin(Faction):
         return etoileRetour
 
     def conquerirGrappe(self):
-        self.initialiserValeurGrappe()
-        self.determinerGrappe()
         nbEnvoi = self.getForceAttaque()
         listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
         etoilePlusProche = None
