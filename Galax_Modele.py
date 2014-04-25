@@ -115,7 +115,7 @@ class Czin(Faction):
         self.listeEtoile[0].flotteStationnaire = Flotte(self,100,None,None)
         self.etoileBase = self.listeEtoile[0]
         self.etoileBaseProspective = self.listeEtoile[0]
-        self.tempsGrappe = None
+        self.tempsGrappe = None # ceci n'est pas utilise ?
 
         self.distanceGrappe = 4
         self.distance_rassemblement = 6
@@ -142,7 +142,7 @@ class Czin(Faction):
                     self.etoileBase = self.listeEtoile[0]   #on remet l_etoile mere comme base
 
         if(self.mode == self.mode_conquerir_grappe):
-            if(not self.listeFlotteEnMouvement):
+            if(not self.listeFlotteEnMouvement): #est-ce une condition assez restrictive ?
                 self.mode = self.mode_rassemblement_forces
 
         if(self.mode == self.mode_rassemblement_forces):
