@@ -183,9 +183,9 @@ class Czin(Faction):
 
         while(self.etoileBase.flotteStationnaire.nbVaisseaux >= nbEnvoi):
             for etoile in listeDeTouteLesEtoile:
-                if(not isinstance(etoile.owner,Czin)):
-                    if(self.flotteEnRouteVers(etoile)):
-                        if(not etoilePlusProche):
+                if(not isinstance(etoile.owner,Czin)): #si l'etoile n'est pas Czin
+                    if(not self.flotteEnRouteVers(etoile)): #si il n'y a pas deja une flotte en direction de l'etoile
+                        if(not etoilePlusProche): #si il n'y a pas d'etoilePlusProche deja Setter
                             etoilePlusProche = etoile
                         else:
                             distance = self.getDistance(etoile,self.etoileBase)
@@ -251,8 +251,9 @@ class Gubru(Faction):
         else:
             self.force_attaque = self.force_attaque_basique * 2
 
-        while(self.listeEtoile[0].flotteStationnaire.nbVaisseaux >= self.force_attaque + self.force_attaque_basique ):
-            self.listeEtoile[0].envoyerNouvelleFlotte(self.force_attaque,self.trouverEtoilePlusPres(self.listeEtoile[0]))
+        if(self.listeEtoile):
+            while(self.listeEtoile[0].flotteStationnaire.nbVaisseaux >= self.force_attaque + self.force_attaque_basique ):
+                self.listeEtoile[0].envoyerNouvelleFlotte(self.force_attaque,self.trouverEtoilePlusPres(self.listeEtoile[0]))
 ########voir les explications dans le commit nomme "Changement majeur dans la gestion des platetes - ajout fn"
 
     def reorganisationDesFlottes(self): #cela doit etre fait a chaque tour
