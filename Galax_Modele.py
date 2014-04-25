@@ -176,7 +176,7 @@ class Czin(Faction):
                         etoileRetour = etoile
         return etoileRetour
 
-    def conquerirGrappe(self):
+    def conquerirGrappe(self): #j'ai encore le bug de NoneType object has no attribute 'PosX' et je suis pas mal certains que ca viens de cette fonction
         nbEnvoi = self.getForceAttaque()
         listeDeTouteLesEtoile = self.parent.getMergedListeEtoile()
         etoilePlusProche = None
