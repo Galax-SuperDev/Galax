@@ -5,16 +5,15 @@ import math
 
 #######################################################
 class Jeu:
-    def __init__(self,nbEtoilesTotales=50):
-        nbEtoileNeutre = nbEtoilesTotales
+    def __init__(self,nbEtoilesTotales):
         self.compteurEtoile = 0
         self.listeFaction = []
         self.listeFaction.append(Humain(self))
         self.listeFaction.append(Gubru(self))
         self.listeFaction.append(Czin(self))
-        self.listeFaction.append(Neutral(nbEtoileNeutre,self))
+        self.listeFaction.append(Neutral(nbEtoilesTotales-3,self))
         self.anneePassees = 0
-        print(self.compteurEtoile)
+        print("Nombre total d'etoile : " + str(self.compteurEtoile))
 
 
     def getMergedListeEtoile(self):
@@ -44,7 +43,7 @@ class Jeu:
                         flotte.destination.flotteStationnaire.mergeFlotte(flotte)
                         print("Flotte:"+str(flotte.nbVaisseaux)+" merge avec la flotte de l'etoile:"+str(flotte.destination.nom))
                     else:                                                 #Sinon, c'est la bataille!
-                        uneflotte = flotte.bataille()
+                        flotte.bataille()
                         if(flotte.flagBataille == True):                    #si c'est l'attaquant qui a gagne la bataille
                             print("Les:"+str(flotte.owner.nom)+" on capturer:"+str(flotte.destination.nom)+" aux mains des:"+str(flotte.destination.owner.nom))
                             flotte.destination.flotteStationnaire = Flotte(flotte.owner,flotte.nbVaisseaux,None,None)
@@ -52,16 +51,11 @@ class Jeu:
                         else:                                               #si les defenseurs ont gagne la bataille
                             print("Les:"+str(flotte.destination.owner.nom)+" on defendu la planete:"+str(flotte.destination.nom)+" contre les:"+str(flotte.owner.nom))
                             pass
-                        #aSupprimer.append(Flotte)
-                    faction.listeFlotteEnMouvement.remove(flotte)
+
+                    faction.listeFlotteEnMouvement.remove(flotte)#suppression de la flotte.
                 else:
                     flotte.updateTravelTime()
-        """if(aSupprimer):
-            self.supprimeurDeListe(aSupprimer)
 
-    def supprimeurDeListe(self,uneListeSupprimable):
-        for itemSupprimable in uneListeSupprimable:
-            del itemSupprimable"""
 
     def lancerFlotteHumain(self,etoileDepart,etoileDestination,force):
     	etoileDepart.envoyerNouvelleFlotte(force,etoileDestination)
@@ -270,10 +264,9 @@ class Gubru(Faction):
 class Neutral(Faction):
     def __init__(self, nbEtoileNeutre, parent):
         Faction.__init__(self, parent)
-        self.nbEtoileNeutre = nbEtoileNeutre
         self.nom = 'Neutral'
         self.tabNomPossible = []
-        self.setupListes()
+        self.setupListes(nbEtoileNeutre)
 
 
     def donnerNomEtoile(self):
@@ -285,8 +278,8 @@ class Neutral(Faction):
                 fileHandle.close()
         return self.tabNomPossible.pop(random.randint(0,len(self.tabNomPossible)-1))
 
-    def setupListes(self):
-        for i in range(self.nbEtoileNeutre):
+    def setupListes(self,nbEtoileNeutre):
+        for i in range(nbEtoileNeutre):
             self.listeEtoile.append(Etoile(Neutral.donnerNomEtoile(self), self))
 
 
@@ -403,6 +396,8 @@ class Flotte:
         self.destination = etoile
 
     def bataille(self):
+        if(isinstance(self.owner,Humain)):
+            self.destination.updateSpyRank()
         tourDefence = True
         if(self.destination.flotteStationnaire.nbVaisseaux > self.nbVaisseaux):
             print("Possibilite d'attaque surprise...")
@@ -425,7 +420,6 @@ class Flotte:
                 self.flagBataille = True
             else:
                 self.flagBataille = False
-        return self
 
 
 

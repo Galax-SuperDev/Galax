@@ -10,7 +10,6 @@ class Vue:
         self.factionVaincue=''
         self.listeEtoiles = []
         self.listeIndexSkinEtoile = []
-        self.nbrEtoiles = 0
         self.etatVue = 0
 
         self.root=Tk()
@@ -57,12 +56,6 @@ class Vue:
         self.endTurnImg = PhotoImage(file="endTurnButton.gif")
         
         self.imagesPlanete = []
-        
-        '''
-        self.planete = PngImageTk("planete0.png")
-        self.planete.convert()
-        '''
-        
         for i in range(0,8):
             self.imagesPlanete.append(PngImageTk("planete"+str(i)+".png"))
             self.imagesPlanete[i].convert()
@@ -82,7 +75,7 @@ class Vue:
         
         self.drawMainMenu()
         
-    def normPosX(self,position): #fuckage ici!
+    def normPosX(self,position):
         return position*32
         """pos = int((position*self.width)/32)+32
         return pos"""
@@ -93,19 +86,15 @@ class Vue:
         return pos"""
     
     def choixNbrEtoiles(self):
-        self.nbrEtoiles = 0
         inputNbrEtoile = Scale(self.root,from_=20, to=80,orient=HORIZONTAL)
         inputNbrEtoile_dansCanevas = self.canvas.create_window(self.screenWidth/2,600,
                                                      window=inputNbrEtoile,tags='nbEtoile')
         def sendReponse():
-            self.nbrEtoiles = inputNbrEtoile.get()
+            self.controlleur.setJeu(inputNbrEtoile.get())
             self.canvas.delete('nbEtoile')
         b = Button(self.root, text="Choisir", width=10, command=sendReponse)
         b_dansCanevas = self.canvas.create_window((self.screenWidth/2),650,
                                                      window=b,tags='nbEtoile')
-
-    def getNbrEtoiles(self):
-        return self.nbrEtoiles
 
     
     def leftClick(self,event):
@@ -117,16 +106,14 @@ class Vue:
         if(self.etatVue == 0):
             if(eventX >= self.buttonPosX and eventX <= self.buttonPosX+self.buttonWidth):
                 if(eventY >= self.buttonPosY1 and eventY <= self.buttonPosY1+self.buttonHeight):
-                    print("button1")
                     self.controlleur.menuLoop(0)
                     self.etatVue = 1
                 elif(eventY >= self.buttonPosY2 and eventY <= self.buttonPosY2+self.buttonHeight):
-                    print("button2")
+                    self.controlleur.menuLoop(1)
                 elif(eventY >= self.buttonPosY3 and eventY <= self.buttonPosY3+self.buttonHeight):
-                    print("button3")
+                    self.controlleur.menuLoop(2)
                 elif(eventY >= self.buttonPosY4 and eventY <= self.buttonPosY4+self.buttonHeight):
-                    print("combien d'etoiles")
-                    self.choixNbrEtoiles()
+                    self.controlleur.menuLoop(3)
         elif(self.etatVue == 1):
             for e in self.listeEtoiles:
         
@@ -163,7 +150,17 @@ class Vue:
                         self.sliderFlottes()
                         self.canvas.delete('menu')
                         self.drawInfosEtoileOrigin(self.etoileOrigin)
-                        
+    
+    def splashMessage(self,message):
+        splashBox = Text(width=self.root.winfo_width(), bg='black', fg='white', font=('Arial', 40))
+        splashBox.delete(1.0, END)
+        splashBox.place(height=100, x=0, y=self.root.winfo_height()/2)
+        splashBox.insert(INSERT,message)
+        self.root.update()
+        time.sleep(0.7)
+        self.setBackground()
+        self.afficher(self.parent.jeu)
+
     def rightClick(self,event):
         eventX = event.x
         eventY = event.y
@@ -224,10 +221,6 @@ class Vue:
 #----------------------------------------------------------------------------------------
 #---------------------   JEU  -----------------------------------------------------------  
 #----------------------------------------------------------------------------------------
-
-    #bool 0 = czin 1= gubru
-    def setFactionVaincue(self,factionVaincue):
-        self.factionVaincue = factionVaincue
         
     #la liste de toutes les etoiles de la partie
     def setListeEtoile(self,listeEtoile):
@@ -254,14 +247,14 @@ class Vue:
         self.boutonFinDeTour()
         self.boutonLaunch()
 
-    def reset(self):
+    def resetSlider(self):
         self.canvas.delete('slider')
         self.sliderFlottes()
 
     
     def actionBoutonLaunch(self):
         self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.slider.get())
-        self.reset()
+        self.resetSlider()
 
     def boutonLaunch(self):
         if(self.controlleur.isHumanMovePossible(self.etoileOrigin) and self.etoileDestination):
