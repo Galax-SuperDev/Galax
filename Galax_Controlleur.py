@@ -10,6 +10,7 @@ class Controlleur:
     def menuLoop(self, vueReturnKey):
         if(vueReturnKey == 0):#NewGame
             self.setJeu()
+            self.vue.etatVue = 1
             self.vue.drawJeu(self.jeu.getMergedListeEtoile())
         elif(vueReturnKey == 1):#High scores
             print("pasEncore implementer")
@@ -25,27 +26,32 @@ class Controlleur:
             self.jeu.moveFlotteEnMouvement()
         self.jeu.ajoutVaisseau()
         self.jeu.anneePassees +=1
+
         if(self.jeu.listeFaction[0].isDead()):
             self.vue.drawFinPartie(False)
         if(self.jeu.listeFaction[1].isDead() and self.jeu.listeFaction[1].isDead()):
             self.vue.drawFinPartie(True)
-            return self.vue.drawMainMenu()
+            self.vue.drawMainMenu()
+            return 
         if(self.jeu.listeFaction[1].isDead()):
-            self.vue.setFactionVaincue(True)
+            self.vue.splashMessage("Les Gubrus sont vaincus")
         if(self.jeu.listeFaction[1].isDead()):
-            self.vue.setFactionVaincue(False)
+            self.vue.splashMessage("Les Czins sont vaincus")
         self.vue.drawJeu(self.jeu.getMergedListeEtoile())
 
-    def launchPress(self,etoileDepart,etoileDestination,force):
-        if(self.isHumanMovePossible(etoileDepart)):
-            self.jeu.lancerFlotteHumain(etoileDepart,etoileDestination,force)
+    def launchPress(self,listeEtoileDepart,etoileDestination,force):
+        if(len(listeEtoileDepart)==1):
+            self.jeu.lancerFlotteHumain(listeEtoileDepart[0], etoileDestination, force)
+        else:
+            for etoileDepart in listeEtoileDepart:
+                self.jeu.lancerFlotteHumain(etoileDepart, etoileDestination, etoileDepart.flotteStationnaire.nbVaisseau)
 
     def isHumanMovePossible(self,etoileDepart):
         if(etoileDepart and isinstance(etoileDepart.owner,Galax_Modele.Humain)):
             return True
         return False
 
-    def setJeu(self,nbEtoile = 50):
+    def setJeu(self,nbEtoile = 40):
         if(not self.jeu):#si la partie n'existe pas
             self.jeu = Galax_Modele.Jeu(nbEtoile)
 

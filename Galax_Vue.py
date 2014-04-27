@@ -7,11 +7,12 @@ class Vue:
     def __init__(self,controlleur):
         self.compteurEtoile = 0
         self.controlleur = controlleur
-        self.factionVaincue=''
+        self.derniereEtoileClick = None
         self.listeEtoiles = []
         self.listeIndexSkinEtoile = []
         self.etatVue = 0
-
+        self.etoileOrigin = []#liste d'etoile d'origine pour pourvoir en sélectionner plusieur a la fois
+        self.etoileDestination = None
         self.root=Tk()
         self.root.title('Galax')
         self.root.iconbitmap(default='galaxIcon.ico')
@@ -36,20 +37,15 @@ class Vue:
         self.slider = None
         self.b_launchDansCanvas = None
 
-        self.etoileOrigin = None
-        self.etoileDestination = None
-        #--------------------------------------------------------
-        self.clickOnSlider = 0
-        #--------------------------------------------------------
+
         self.canvas=Canvas(self.root, width=self.screenWidth, height=self.screenHeight, bg='black')  
               
         #self.canvas.bind('<Configure>', self.resize)
         self.canvas.bind('<Button-1>', self.leftClick)
         self.canvas.bind('<Button-3>', self.rightClick)
-    
         self.canvas.pack()
-    
-        #image de background
+    ###########################################################
+        #image :
         self.background = PhotoImage(file="background.gif")
         self.sideBarLeftImg = PhotoImage(file="sidebarLeft.gif")
         self.sideBarImg = PhotoImage(file="sidebarbot.gif")
@@ -70,9 +66,7 @@ class Vue:
         
         self.imageCursorDestination = PngImageTk("cursor_1.png")
         self.imageCursorDestination.convert()
-        
-        #self.canvas.create_image(0,0,anchor=NW,image=self.background)
-        
+    ###########################################################    
         self.drawMainMenu()
         
     def normPosX(self,position):
@@ -96,7 +90,7 @@ class Vue:
         b_dansCanevas = self.canvas.create_window((self.screenWidth/2),650,
                                                      window=b,tags='nbEtoile')
 
-    
+
     def leftClick(self,event):
         eventX = event.x
         eventY = event.y
@@ -107,7 +101,6 @@ class Vue:
             if(eventX >= self.buttonPosX and eventX <= self.buttonPosX+self.buttonWidth):
                 if(eventY >= self.buttonPosY1 and eventY <= self.buttonPosY1+self.buttonHeight):
                     self.controlleur.menuLoop(0)
-                    self.etatVue = 1
                 elif(eventY >= self.buttonPosY2 and eventY <= self.buttonPosY2+self.buttonHeight):
                     self.controlleur.menuLoop(1)
                 elif(eventY >= self.buttonPosY3 and eventY <= self.buttonPosY3+self.buttonHeight):
@@ -115,51 +108,33 @@ class Vue:
                 elif(eventY >= self.buttonPosY4 and eventY <= self.buttonPosY4+self.buttonHeight):
                     self.controlleur.menuLoop(3)
         elif(self.etatVue == 1):
+            self.initSurfaceDessin()
             for e in self.listeEtoiles:
-        
                 posX = self.normPosX(e.posX)
                 posY = self.normPosY(e.posY)
-                
                 if(eventX >= posX and eventX <= posX+32):
-                    if(eventY >= posY and eventY <= posY+32):
-                        
-                        print('click sur etoile')
-                        
-                        self.etoileOrigin = e
-                        self.etoileDestination = None
-                        self.sliderFlottes()
-                        
-                        cursorX = posX+16
-                        cursorY = posY+16
-                        
-                        self.canvas.delete('cursor')
-                        self.canvas.delete('cursorDest')
-                        self.canvas.delete('trajet')
-                        if(self.b_launchDansCanvas != None):
-                            self.canvas.delete('slider')
-                            self.canvas.delete('launcher')
-                        
-                        self.canvas.create_image(cursorX, cursorY, image=self.imageCursor.image, anchor=CENTER,tags='cursor')
-                        
-                        self.canvas.delete('menu')
-                        
-                        self.canvas.create_text(self.screenWidth-220,57,anchor=NW,
-                                                text="nom de l'etoile",fill='white',
-                                                font=('consolas','12'),
-                                                tags='menu')
-                        self.sliderFlottes()
-                        self.canvas.delete('menu')
-                        self.drawInfosEtoileOrigin(self.etoileOrigin)
-    
-    def splashMessage(self,message):
-        splashBox = Text(width=self.root.winfo_width(), bg='black', fg='white', font=('Arial', 40))
-        splashBox.delete(1.0, END)
-        splashBox.place(height=100, x=0, y=self.root.winfo_height()/2)
-        splashBox.insert(INSERT,message)
-        self.root.update()
-        time.sleep(0.7)
-        self.setBackground()
-        self.afficher(self.parent.jeu)
+                    if(eventY >= posY and eventY <= posY+32):#si click sur etoile
+                        self.derniereEtoileClick = e
+                        if(e.owner.nom == "Humain"):    #si humain
+                            if(not self.etoileOrigin.count(e)): #si l'etoile en question n'est pas deja selectionne
+                                self.etoileOrigin.append(e)
+                                self.etoileDestination = None
+                                self.canvas.delete('menu')
+                                self.drawInfosEtoileOrigin(self.derniereEtoileClick)
+                                self.drawSurfaceDeJeu()  
+                                if(len(self.etoileOrigin) == 1):
+                                    self.dessineSliderFlottes()
+                                break
+                        else:
+                            self.etoileOrigin[:] = []  
+                            self.etoileDestination = e
+                            self.canvas.delete('menu')
+                            self.drawInfosEtoileDestination(self.derniereEtoileClick)
+                            self.drawSurfaceDeJeu()
+                                 
+            else:
+                self.etoileOrigin[:] = []#sinon vide la selection
+                
 
     def rightClick(self,event):
         eventX = event.x
@@ -173,14 +148,16 @@ class Vue:
             if(eventX >= posX and eventX <= posX+32):
                 if(eventY >= posY and eventY <= posY+32):
                     
-                    print('click sur etoile')
-                    
                     self.etoileDestination = e
-                    self.boutonLaunch()
+                    if(self.etoileOrigin):
+                        self.boutonLaunchMAX()
+                        if(len(self.etoileOrigin) == 1):
+                            self.boutonLaunch()
+                            
                     
-                    if(self.controlleur.isHumanMovePossible(self.etoileOrigin)):
-                        oriX = self.normPosX(self.etoileOrigin.posX)+16
-                        oriY = self.normPosY(self.etoileOrigin.posY)+16
+                    if(self.controlleur.isHumanMovePossible(self.etoileOrigin[0])):
+                        oriX = self.normPosX(self.etoileOrigin[0].posX)+16
+                        oriY = self.normPosY(self.etoileOrigin[0].posY)+16
                         
                         destX = self.normPosX(self.etoileDestination.posX)+16
                         destY = self.normPosY(self.etoileDestination.posY)+16
@@ -205,9 +182,9 @@ class Vue:
                                                 font=('consolas','12'),
                                                 tags='menu')
                         self.canvas.delete('menu')
-                        self.drawInfosEtoileOrigin(self.etoileOrigin)
+                        self.drawInfosEtoileOrigin(self.derniereEtoileClick)
                         self.drawInfosEtoileDestination(self.etoileDestination)
-        
+
                         
     '''
     def resize(self,event):
@@ -218,18 +195,31 @@ class Vue:
         
         self.drawMenu()
     '''
+    def effacerFrame(self):
+
+        listeWidgets = self.root.winfo_children()
+
+        for i in listeWidgets:
+            i.pack_forget()
+            i.place_forget()
 #----------------------------------------------------------------------------------------
 #---------------------   JEU  -----------------------------------------------------------  
 #----------------------------------------------------------------------------------------
         
-    #la liste de toutes les etoiles de la partie
-    def setListeEtoile(self,listeEtoile):
-        self.listeEtoiles = listeEtoile
+    def splashMessage(self,message):
+        splashBox = Text(width=self.root.winfo_width(), bg='black', fg='white', font=('Arial', 40),tags='splashBox')
+        splashBox.delete(1.0, END)
+        splashBox.place(height=100, x=0, y=self.root.winfo_height()/2)
+        splashBox.insert(INSERT,message)
+        self.root.update()
+        time.sleep(1)
+        self.root.delete('splashBox')
+
         
     def drawJeu(self,listeEtoiles):
-        self.setListeEtoile(listeEtoiles)
+        self.listeEtoiles = listeEtoiles
         self.canvas.delete('all')
-        self.drawEtoiles(listeEtoiles)
+        self.drawSurfaceDeJeu()
         self.drawBottomMenu()
         self.drawSideMenu()
         
@@ -238,33 +228,48 @@ class Vue:
 
         
     def drawBottomMenu(self):
-        self.canvas.create_image(0,self.screenHeight-128,image=self.sideBarImg,anchor=NW)
-        
-        # dessin du boutton de fin de tour --------------------------------------------
-        self.canvas.create_image(self.screenWidth-256,self.screenHeight-128,image=self.endTurnImg,anchor=NW,tags='endTurnButton')
-
-        self.sliderFlottes()
+        self.canvas.create_image(0,self.screenHeight-128,image=self.sideBarImg,anchor=NW)#sidebarImage
+        self.canvas.create_image(self.screenWidth-256,self.screenHeight-128,image=self.endTurnImg,anchor=NW,tags='endTurnButton')# dessin du boutton de fin de tour
         self.boutonFinDeTour()
-        self.boutonLaunch()
+
+
+    def initSurfaceDessin(self):
+        self.etoileDestination = None
+        self.canvas.delete('cursorDest')
+        self.canvas.delete('trajet')
+        self.canvas.delete('cursor')
+        if(self.b_launchDansCanvas):
+            self.canvas.delete('slider')
+            self.canvas.delete('launcher')
 
     def resetSlider(self):
         self.canvas.delete('slider')
-        self.sliderFlottes()
+        self.dessineSliderFlottes()
 
     
-    def actionBoutonLaunch(self):
-        self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.slider.get())
-        self.resetSlider()
+    def actionBoutonLaunch(self,maximum):
+        if(maximum):
+            self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.etoileOrigin[0].flotteStationnaire.nbVaisseaux)
+        else:
+            self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.slider.get())
+        if(len(self.etoileOrigin) == 1):
+            self.resetSlider()
 
     def boutonLaunch(self):
-        if(self.controlleur.isHumanMovePossible(self.etoileOrigin) and self.etoileDestination):
-            boutonLaunch = Button(self.root,text="LAUNCH!",
-                                     command= self.actionBoutonLaunch)
-            self.b_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunch,tags='launcher')
+        if(self.etoileOrigin):
+            if(self.controlleur.isHumanMovePossible(self.etoileOrigin[0]) and self.etoileDestination):
+                boutonLaunch = Button(self.root,text="LAUNCH!", command= lambda: self.actionBoutonLaunch(False))
+                self.b_launchDansCanvas = self.canvas.create_window(650,680,window=boutonLaunch,tags='launcher')
+
+    def boutonLaunchMAX(self):
+        if(self.etoileOrigin):
+            if(self.controlleur.isHumanMovePossible(self.etoileOrigin[0]) and self.etoileDestination):
+                boutonLaunchMax = Button(self.root,text="Launch MAX", command= lambda: self.actionBoutonLaunch(True))
+                self.b_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunchMax,tags='launcher')
+
 
     def boutonFinDeTour(self):
         boutonFinTour = Button(self.root,width=20,height=1,text="Fin du tour",command=self.controlleur.gameLoop,bg='black',fg='red')
-
         self.b_EndTurn = self.canvas.create_window(self.screenWidth-160,self.screenHeight-90,window=boutonFinTour)
 
 
@@ -272,30 +277,44 @@ class Vue:
         
 
         # dessin du slider de gestion des flottes --------------------------------------
-    def sliderFlottes(self): 
-        if(self.controlleur.isHumanMovePossible(self.etoileOrigin)):
-            self.slider = Scale(self.root,from_=0,to=int(self.etoileOrigin.flotteStationnaire.nbVaisseaux),
-                            orient=HORIZONTAL,label="Nombres de vaisseaux a envoyer",
-                            bg='gray40',length=300)
+    def dessineSliderFlottes(self): 
+        if(self.etoileOrigin):
+            if(self.controlleur.isHumanMovePossible(self.etoileOrigin[0])):
+                self.slider = Scale(self.root,from_=0,to=int(self.etoileOrigin[0].flotteStationnaire.nbVaisseaux),
+                                orient=HORIZONTAL,label="Nombres de vaisseaux a envoyer",
+                                bg='gray40',length=300)
             slider_dansCanvas = self.canvas.create_window(200,715,window=self.slider,tags='slider')
 
 
 
-        
-    def drawEtoiles(self,listeEtoiles):
+    def drawSurfaceDeJeu(self):
         self.canvas.create_image(0,0,image=self.background,anchor=NW)
+        if(self.etoileDestination):
+            self.drawCurseurDestination()
+        if(self.etoileOrigin):
+            for etoile in self.etoileOrigin:
+                self.drawCurseur(etoile)
+        self.drawEtoiles()
+
+    def drawCurseur(self,etoile):
+        self.canvas.create_image(self.normPosX(etoile.posX)+16, self.normPosY(etoile.posY)+16, image=self.imageCursor.image, anchor=CENTER,tags='cursor')
+
+    def drawCurseurDestination(self):
+        self.canvas.create_image(self.normPosX(self.etoileDestination.posX)+16, self.normPosY(self.etoileDestination.posY)+16, image=self.imageCursorDestination.image, anchor=CENTER,tags='cursor')
+
+    def drawEtoiles(self):
         i = -1
-        for e in listeEtoiles:
+        for e in self.listeEtoiles:
             i+=1
             posX = self.normPosX(e.posX)
             posY = self.normPosY(e.posY)
             if(e.owner.nom == "Czin"):
-                self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[0].image, anchor=NW,tags="etoile")
+                self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[0].image, anchor=NW,tags=("etoile","surfaceDejeu"))
             if(e.owner.nom == "Gubru"):
                 self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[1].image, anchor=NW,tags="etoile")
             if(e.owner.nom == "Humain"):
                 self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[2].image, anchor=NW,tags="etoile")
-            if(len(listeEtoiles) >= len(self.listeIndexSkinEtoile)):
+            if(len(self.listeEtoiles) >= len(self.listeIndexSkinEtoile)):
                 self.listeIndexSkinEtoile.append(random.randint(0,7))
             self.canvas.create_image(posX, posY, image=self.imagesPlanete[self.listeIndexSkinEtoile[i]].image, anchor=NW,tags="etoile")
 
