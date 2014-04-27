@@ -7,7 +7,7 @@ class Vue:
     def __init__(self,controlleur):
         self.compteurEtoile = 0
         self.controlleur = controlleur
-        self.derniereEtoileClick = None
+        self.derniereEtoileClickGauche = None
         self.listeEtoiles = []
         self.listeIndexSkinEtoile = []
         self.etatVue = 0
@@ -36,6 +36,7 @@ class Vue:
         
         self.slider = None
         self.b_launchDansCanvas = None
+        self.b2_launchDansCanvas = None
 
 
         self.canvas=Canvas(self.root, width=self.screenWidth, height=self.screenHeight, bg='black')  
@@ -71,14 +72,10 @@ class Vue:
         
     def normPosX(self,position):
         return position*32
-        """pos = int((position*self.width)/32)+32
-        return pos"""
     
     def normPosY(self,position):
         return position*32
-        """pos = int((position*self.height)/20)+32
-        return pos"""
-    
+
     def choixNbrEtoiles(self):
         inputNbrEtoile = Scale(self.root,from_=20, to=80,orient=HORIZONTAL)
         inputNbrEtoile_dansCanevas = self.canvas.create_window(self.screenWidth/2,600,
@@ -94,8 +91,6 @@ class Vue:
     def leftClick(self,event):
         eventX = event.x
         eventY = event.y
-        print ('x:'+str(eventX)+' y:'+str(eventY),end=' ')
-        
         # permet de savoir si la partie de jeu est debutee 0 
         if(self.etatVue == 0):
             if(eventX >= self.buttonPosX and eventX <= self.buttonPosX+self.buttonWidth):
@@ -114,14 +109,13 @@ class Vue:
                 posY = self.normPosY(e.posY)
                 if(eventX >= posX and eventX <= posX+32):
                     if(eventY >= posY and eventY <= posY+32):#si click sur etoile
-                        self.derniereEtoileClick = e
+                        self.derniereEtoileClickGauche = e
                         if(e.owner.nom == "Humain"):    #si humain
                             if(not self.etoileOrigin.count(e)): #si l'etoile en question n'est pas deja selectionne
                                 self.etoileOrigin.append(e)
                                 self.etoileDestination = None
                                 self.canvas.delete('menu')
-                                self.drawInfosEtoileOrigin(self.derniereEtoileClick)
-                                self.drawSurfaceDeJeu()  
+                                self.drawInfosEtoileOrigin(self.derniereEtoileClickGauche)
                                 if(len(self.etoileOrigin) == 1):
                                     self.dessineSliderFlottes()
                                 break
@@ -129,12 +123,11 @@ class Vue:
                             self.etoileOrigin[:] = []  
                             self.etoileDestination = e
                             self.canvas.delete('menu')
-                            self.drawInfosEtoileDestination(self.derniereEtoileClick)
-                            self.drawSurfaceDeJeu()
+                            self.drawInfosEtoileDestination(self.derniereEtoileClickGauche)
                                  
             else:
                 self.etoileOrigin[:] = []#sinon vide la selection
-                
+            self.drawSurfaceDeJeu()
 
     def rightClick(self,event):
         eventX = event.x
@@ -150,40 +143,25 @@ class Vue:
                     
                     self.etoileDestination = e
                     if(self.etoileOrigin):
-                        self.boutonLaunchMAX()
-                        if(len(self.etoileOrigin) == 1):
-                            self.boutonLaunch()
-                            
-                    
-                    if(self.controlleur.isHumanMovePossible(self.etoileOrigin[0])):
-                        oriX = self.normPosX(self.etoileOrigin[0].posX)+16
-                        oriY = self.normPosY(self.etoileOrigin[0].posY)+16
-                        
+                        self.drawBoutonLaunch()                            
                         destX = self.normPosX(self.etoileDestination.posX)+16
                         destY = self.normPosY(self.etoileDestination.posY)+16
-                        
                         cursorX = posX+16
                         cursorY = posY+16
-                        
-                        
                         self.canvas.delete('cursorDest')
                         self.canvas.create_image(cursorX, cursorY, 
                                                  image=self.imageCursorDestination.image, 
-                                                 anchor=CENTER,tags='cursorDest')
-
+                                                 anchor=CENTER,tags=('cursorDest','surfaceDejeu'))
                         self.canvas.delete('trajet')
-                        self.canvas.create_line(oriX,oriY,
-                                                destX,destY,fill='white',tags='trajet')
-                        
                         self.canvas.delete('menu')
-                        
-                        self.canvas.create_text(self.screenWidth-220,57,anchor=NW,
-                                                text="nom de l'etoile",fill='white',
-                                                font=('consolas','12'),
-                                                tags='menu')
-                        self.canvas.delete('menu')
-                        self.drawInfosEtoileOrigin(self.derniereEtoileClick)
+                        self.drawInfosEtoileOrigin(self.etoileOrigin[len(self.etoileOrigin)-1])
                         self.drawInfosEtoileDestination(self.etoileDestination)
+                        for etoile in self.etoileOrigin:
+                            oriX = self.normPosX(self.etoileOrigin[0].posX)+16
+                            oriY = self.normPosY(self.etoileOrigin[0].posY)+16
+                            self.canvas.create_line(oriX,oriY, destX,destY,fill='white',tags=('trajet','surfaceDejeu'))
+                            
+                            
 
                         
     '''
@@ -235,12 +213,9 @@ class Vue:
 
     def initSurfaceDessin(self):
         self.etoileDestination = None
-        self.canvas.delete('cursorDest')
-        self.canvas.delete('trajet')
-        self.canvas.delete('cursor')
-        if(self.b_launchDansCanvas):
-            self.canvas.delete('slider')
-            self.canvas.delete('launcher')
+        self.canvas.delete('slider')
+        self.canvas.delete('menuContour')
+        self.canvas.delete('surfaceDejeu')
 
     def resetSlider(self):
         self.canvas.delete('slider')
@@ -255,18 +230,14 @@ class Vue:
         if(len(self.etoileOrigin) == 1):
             self.resetSlider()
 
-    def boutonLaunch(self):
-        if(self.etoileOrigin):
-            if(self.controlleur.isHumanMovePossible(self.etoileOrigin[0]) and self.etoileDestination):
-                boutonLaunch = Button(self.root,text="LAUNCH!", command= lambda: self.actionBoutonLaunch(False))
-                self.b_launchDansCanvas = self.canvas.create_window(650,680,window=boutonLaunch,tags='launcher')
-
-    def boutonLaunchMAX(self):
+    def drawBoutonLaunch(self):
         if(self.etoileOrigin):
             if(self.controlleur.isHumanMovePossible(self.etoileOrigin[0]) and self.etoileDestination):
                 boutonLaunchMax = Button(self.root,text="Launch MAX", command= lambda: self.actionBoutonLaunch(True))
-                self.b_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunchMax,tags='launcher')
-
+                self.b2_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunchMax,tags=('launcher','surfaceDejeu'))
+                if(len(self.etoileOrigin) == 1):
+                    boutonLaunch = Button(self.root,text="LAUNCH!", command= lambda: self.actionBoutonLaunch(False))
+                    self.b_launchDansCanvas = self.canvas.create_window(650,680,window=boutonLaunch,tags=('launcher','surfaceDejeu'))
 
     def boutonFinDeTour(self):
         boutonFinTour = Button(self.root,width=20,height=1,text="Fin du tour",command=self.controlleur.gameLoop,bg='black',fg='red')
@@ -283,7 +254,7 @@ class Vue:
                 self.slider = Scale(self.root,from_=0,to=int(self.etoileOrigin[0].flotteStationnaire.nbVaisseaux),
                                 orient=HORIZONTAL,label="Nombres de vaisseaux a envoyer",
                                 bg='gray40',length=300)
-            slider_dansCanvas = self.canvas.create_window(200,715,window=self.slider,tags='slider')
+            slider_dansCanvas = self.canvas.create_window(200,715,window=self.slider,tags=('slider','menuContour'))
 
 
 
@@ -297,10 +268,10 @@ class Vue:
         self.drawEtoiles()
 
     def drawCurseur(self,etoile):
-        self.canvas.create_image(self.normPosX(etoile.posX)+16, self.normPosY(etoile.posY)+16, image=self.imageCursor.image, anchor=CENTER,tags='cursor')
+        self.canvas.create_image(self.normPosX(etoile.posX)+16, self.normPosY(etoile.posY)+16, image=self.imageCursor.image, anchor=CENTER,tags=('cursor','surfaceDejeu'))
 
     def drawCurseurDestination(self):
-        self.canvas.create_image(self.normPosX(self.etoileDestination.posX)+16, self.normPosY(self.etoileDestination.posY)+16, image=self.imageCursorDestination.image, anchor=CENTER,tags='cursor')
+        self.canvas.create_image(self.normPosX(self.etoileDestination.posX)+16, self.normPosY(self.etoileDestination.posY)+16, image=self.imageCursorDestination.image, anchor=CENTER,tags=('cursor','surfaceDejeu'))
 
     def drawEtoiles(self):
         i = -1
@@ -311,12 +282,12 @@ class Vue:
             if(e.owner.nom == "Czin"):
                 self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[0].image, anchor=NW,tags=("etoile","surfaceDejeu"))
             if(e.owner.nom == "Gubru"):
-                self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[1].image, anchor=NW,tags="etoile")
+                self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[1].image, anchor=NW,tags=("etoile",'surfaceDejeu'))
             if(e.owner.nom == "Humain"):
-                self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[2].image, anchor=NW,tags="etoile")
+                self.canvas.create_image(posX-16, posY-16, image=self.imagesOmbre[2].image, anchor=NW,tags=("etoile",'surfaceDejeu'))
             if(len(self.listeEtoiles) >= len(self.listeIndexSkinEtoile)):
                 self.listeIndexSkinEtoile.append(random.randint(0,7))
-            self.canvas.create_image(posX, posY, image=self.imagesPlanete[self.listeIndexSkinEtoile[i]].image, anchor=NW,tags="etoile")
+            self.canvas.create_image(posX, posY, image=self.imagesPlanete[self.listeIndexSkinEtoile[i]].image, anchor=NW,tags=("etoile",'surfaceDejeu'))
 
 
             
@@ -325,27 +296,27 @@ class Vue:
         self.canvas.create_text(self.screenWidth-220,58,anchor=NW,
                 text="Owner:"+str(etoile.owner.nom),fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
         
         self.canvas.create_text(self.screenWidth-220,74,anchor=NW,
                 text="Nom de l'etoile:",fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
         
         self.canvas.create_text(self.screenWidth-220,90,anchor=NW,
                 text=etoile.nom,fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
 
         self.canvas.create_text(self.screenWidth-220,106,anchor=NW,
                 text="x:"+str(etoile.posX)+" y:"+str(etoile.posY),fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
         
         self.canvas.create_text(self.screenWidth-220,122,anchor=NW,
                 text="Spy rank:"+str(etoile.spyRank),fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
 
         if(etoile.getNbUsine() == -1):
             texte = "Nombre d'usines: - ? ? ? -"
@@ -354,7 +325,7 @@ class Vue:
         self.canvas.create_text(self.screenWidth-220,138,anchor=NW,
                 text=texte,fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
 
         if(etoile.getNbVaisseau() == -1):
             texte = "Nb Vaisseaux: - ? ? ? -"
@@ -363,34 +334,34 @@ class Vue:
         self.canvas.create_text(self.screenWidth-220,154,anchor=NW,
                 text=texte,fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
         
     def drawInfosEtoileDestination(self,etoile): 
              
         self.canvas.create_text(self.screenWidth-220,202,anchor=NW,
                 text="Owner:"+str(etoile.owner.nom),fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
         
         self.canvas.create_text(self.screenWidth-220,218,anchor=NW,
                 text="Nom de l'etoile:",fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
         
         self.canvas.create_text(self.screenWidth-220,234,anchor=NW,
                 text=etoile.nom,fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
 
         self.canvas.create_text(self.screenWidth-220,250,anchor=NW,
                 text="x:"+str(etoile.posX)+" y:"+str(etoile.posY),fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
         
         self.canvas.create_text(self.screenWidth-220,266,anchor=NW,
                 text="Spy rank:"+str(etoile.spyRank),fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
 
         if(etoile.getNbUsine() == -1):
             texte = "Nombre d'usines: - ? ? ? -"
@@ -399,7 +370,7 @@ class Vue:
         self.canvas.create_text(self.screenWidth-220,282,anchor=NW,
                 text=texte,fill='white',
                 font=('consolas','10'),
-                tags='menu')
+                tags=('menu','menuContour'))
         
         if(etoile.getNbVaisseau() == -1):
             texte = "Nb Vaisseaux: - ? ? ? -"
@@ -408,7 +379,7 @@ class Vue:
         self.canvas.create_text(self.screenWidth-220,298,anchor=NW,
                 text=texte,fill='white',
                 font=('consolas','10'),
-                tags='menu')             
+                tags=('menu','menuContour'))
 #----------------------------------------------------------------------------------------
 #---------------------   JEU  -----------------------------------------------------------  
 #----------------------------------------------------------------------------------------

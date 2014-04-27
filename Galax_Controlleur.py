@@ -37,6 +37,12 @@ class Controlleur:
             self.vue.splashMessage("Les Gubrus sont vaincus")
         if(self.jeu.listeFaction[1].isDead()):
             self.vue.splashMessage("Les Czins sont vaincus")
+        
+        for etoile in self.vue.etoileOrigin:
+            if(self.isStillHumain(etoile)):
+                pass #good, cette etoile t'appartient encore!
+            else: #ohoh...
+                self.vue.etoileOrigin.remove(etoile)
         self.vue.drawJeu(self.jeu.getMergedListeEtoile())
 
     def launchPress(self,listeEtoileDepart,etoileDestination,force):
@@ -44,10 +50,15 @@ class Controlleur:
             self.jeu.lancerFlotteHumain(listeEtoileDepart[0], etoileDestination, force)
         else:
             for etoileDepart in listeEtoileDepart:
-                self.jeu.lancerFlotteHumain(etoileDepart, etoileDestination, etoileDepart.flotteStationnaire.nbVaisseau)
+                self.jeu.lancerFlotteHumain(etoileDepart, etoileDestination, etoileDepart.flotteStationnaire.nbVaisseaux)
 
     def isHumanMovePossible(self,etoileDepart):
-        if(etoileDepart and isinstance(etoileDepart.owner,Galax_Modele.Humain)):
+        if(etoileDepart and self.isStillHumain(etoileDepart)):
+            return True
+        return False
+
+    def isStillHumain(self,etoile):
+        if(isinstance(etoile.owner,Galax_Modele.Humain)):
             return True
         return False
 

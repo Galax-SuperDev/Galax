@@ -270,8 +270,8 @@ class Neutral(Faction):
 
 
     def donnerNomEtoile(self):
-        fileHandle = open('listeNomEtoile.txt','r')
         if(not self.tabNomPossible):#si le fichier n'est pas encore parser...
+            fileHandle = open('listeNomEtoile.txt','r')
             for ligne in fileHandle.readlines():
                 self.tabNomPossible.append(str(ligne).rstrip())
             else:
