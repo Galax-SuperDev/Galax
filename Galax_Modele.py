@@ -17,8 +17,10 @@ class Jeu:
         self.listeFaction.append(self.gubru)
         self.listeFaction.append(self.czin)
         self.listeFaction.append(self.neutral)
-        self.anneePassees = 0
         print("********** Nombre total d'etoile : " + str(self.compteurEtoile)+" *************")
+        self.setPositionEtoile()
+        self.anneePassees = 0
+        
         print("********** Mouvement du joueur ********************")
 
 
@@ -65,7 +67,33 @@ class Jeu:
     def lancerFlotteHumain(self,etoileDepart,etoileDestination,force):
     	etoileDepart.envoyerNouvelleFlotte(force,etoileDestination)
 
+    def setPositionEtoile(self):  #attribut une position au hasare au etoiles en verifiant de ne pas en mettre sur une etoile existante
+        for faction in self.listeFaction:
+            for e1 in faction.listeEtoile:
+                while(True):        #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au break
+                    e1.posX = random.randint(0,31)
+                    e1.posY = random.randint(0,19)
+                    for faction in self.listeFaction:                   #pour chaque faction dans la liste de faction
+                        for e2 in faction.listeEtoile:                  #pour chaque etoile dans la liste d'etoile contenue dans chaque faction
+                            if(e1.nom != e2.nom):
+                                if(not self.etoilesMereAssezLoin(e1,e2) or (e1.posX == e2.posX and e1.posY == e2.posY)):   #si la position de l'etoile courante est egale a la position d'une autre etoile
+                                    break   #fait sortir du 2e "for", qui nous ammene au second break
+                        else:               #si la 2e boucle finis sans arriver sur un break
+                            continue        #retourne et continue l'iteration dans le 1er "for"
+                        break               #fait sortir du 1er "for", qui nous ammene au "while" au dessus
+                    else:                   #si les deux boucles ont finis sans rencontrer une seule fois une etoile a la meme position que l'etoile courante
+                        break               #quitte la boucle while
 
+    def etoilesMereAssezLoin(self,etoile1,etoile2):
+        if(etoile1.owner.nom is not "Neutral" and etoile2.owner.nom is not "Neutral"):
+            print(etoile1.nom)
+            print(etoile2.nom)
+            if(etoile1.owner.getDistance(etoile1,etoile2) > 10):
+                return True
+            else:
+                return False
+        else:
+            return True
 
 
 
@@ -304,9 +332,8 @@ class Etoile:
     def __init__(self,nom,owner):
         self.nom = nom
         self.owner = owner
-        self.posX = None
-        self.posY = None
-        self.setPosition()#afin d'attribuer une valeur a posX et posY
+        self.posX = random.randint(0,31)
+        self.posY = random.randint(0,19)
         self.flotteStationnaire = Flotte(self.owner, 0, None, None)
         self.flotteAuDernierPassage = -1
         self.spyRank = 0
@@ -353,22 +380,7 @@ class Etoile:
         self.owner = newOwner
         self.flotteAuDernierPassage = -1
 
-    def setPosition(self):  #attribut une position au hasare a l'etoile en verifiant de ne pas la mettre sur une etoile existante
-        while(True):        #boucle infini qui s'arrete lorsque le dernier else est executer et arrive au return
-            posX = random.randint(0,31)
-            posY = random.randint(0,19)
-            for faction in self.owner.parent.listeFaction:          #pour chaque faction dans la liste de faction
-                for etoile in faction.listeEtoile:                  #pour chaque etoile dans la liste d'etoile contenue dans chaque faction
-                    if( posX==etoile.posX and posY==etoile.posY):   #si la position de l'etoile courante est egale a la position d'une autre etoile
-                        break       #fait sortir du 2e "for", qui nous ammene au second break
-                else:               #si la 2e boucle finis sans heurt
-                    continue        #retourne et continue l'iteration dans le 1er "for"
-                break               #fait sortir du 1er "for", qui nous ammÃƒÂ¨ne au "while" au dessus
-            else:                   #si les deux boucles ont finis sans rencontrer une seule fois une etoile a la meme position que l'etoile courante
-                self.posX = posX    #attribution de la position en x
-                self.posY = posY    #attribution de la position en y
-                return              #quitte la fonction
-
+    
 
 
 
