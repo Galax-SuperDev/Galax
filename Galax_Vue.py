@@ -103,7 +103,7 @@ class Vue:
                 elif(eventY >= self.buttonPosY4 and eventY <= self.buttonPosY4+self.buttonHeight):
                     self.controlleur.menuLoop(3)
         elif(self.etatVue == 1):
-            self.initSurfaceDessin()
+            self.initSurfaceDeJeu()
             for e in self.listeEtoiles:
                 posX = self.normPosX(e.posX)
                 posY = self.normPosY(e.posY)

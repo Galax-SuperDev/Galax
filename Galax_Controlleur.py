@@ -14,7 +14,7 @@ class Controlleur:
             self.vue.drawJeu(self.jeu.getMergedListeEtoile())
         elif(vueReturnKey == 1):#High scores
             print("pasEncore implementer")
-        elif(vueReturnKey == 2):#Quitter"
+        elif(vueReturnKey == 2):#Quitter
             self.vue.root.destroy()
         elif(vueReturnKey == 3): #choix du nombres d'etoiles
             self.vue.choixNbrEtoiles()
@@ -35,7 +35,7 @@ class Controlleur:
             self.vue.etatVue = 0
             self.jeu = None
             return
-        if(self.jeu.listeFaction[1].isDead() and self.jeu.listeFaction[1].isDead()):
+        if(self.jeu.listeFaction[1].isDead() and self.jeu.listeFaction[2].isDead()):
             self.vue.drawFinPartie(True)
             self.vue.drawMainMenu()
             self.vue.etatVue = 0
@@ -43,7 +43,7 @@ class Controlleur:
             return 
         if(self.jeu.listeFaction[1].isDead()):
             self.vue.splashMessage("Les Gubrus sont vaincus")
-        if(self.jeu.listeFaction[1].isDead()):
+        if(self.jeu.listeFaction[2].isDead()):
             self.vue.splashMessage("Les Czins sont vaincus")
         
         for etoile in self.vue.etoileOrigin:
@@ -51,7 +51,7 @@ class Controlleur:
                 pass #good, cette etoile t'appartient encore!
             else: #ohoh...
                 self.vue.etoileOrigin.remove(etoile)
-                
+
         print("********** Mouvement du joueur ********************")
         self.vue.drawJeu(self.jeu.getMergedListeEtoile())
 

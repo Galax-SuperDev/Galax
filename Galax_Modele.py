@@ -150,12 +150,11 @@ class Czin(Faction):
             armada = self.listeFlotteEnMouvement[len(self.listeFlotteEnMouvement)-1]
             return False
         elif(self.armada == None):#si l'armada est arrive a destination et c'est battu
-            self.armada = None
             self.armadaPasEnvoyer = True
             if(self.etoileBaseProspective.owner.nom == self.nom):#si la baseProspective est en possession des Czins
                 self.etoileBase = self.etoileBaseProspective
                 self.mode = self.mode_conquerir_grappe
-            else:                                       #sinon, ca veux dire que les defenceurs ont gagne.
+            else:                                       #sinon, ca veux dire que les defenseurs ont gagne.
                 self.mode = self.mode_rassemblement_forces
             return True
     def conquerirGrappe(self):
