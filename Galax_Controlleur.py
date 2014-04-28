@@ -20,18 +20,26 @@ class Controlleur:
             self.vue.choixNbrEtoiles()
 
     def gameLoop(self):
+        print("********** Movement IA ****************************")
         self.jeu.gestionTroupes()
+        print("********** Gestion d'une annee ********************")
         for i in range(10):
-            print(i)
+            print("********** "+str(i)+"/10 ***********************************")
             self.jeu.moveFlotteEnMouvement()
         self.jeu.ajoutVaisseau()
         self.jeu.anneePassees +=1
 
         if(self.jeu.listeFaction[0].isDead()):
             self.vue.drawFinPartie(False)
+            self.vue.drawMainMenu()
+            self.vue.etatVue = 0
+            self.jeu = None
+            return
         if(self.jeu.listeFaction[1].isDead() and self.jeu.listeFaction[1].isDead()):
             self.vue.drawFinPartie(True)
             self.vue.drawMainMenu()
+            self.vue.etatVue = 0
+            self.jeu = None
             return 
         if(self.jeu.listeFaction[1].isDead()):
             self.vue.splashMessage("Les Gubrus sont vaincus")
@@ -43,6 +51,8 @@ class Controlleur:
                 pass #good, cette etoile t'appartient encore!
             else: #ohoh...
                 self.vue.etoileOrigin.remove(etoile)
+                
+        print("********** Mouvement du joueur ********************")
         self.vue.drawJeu(self.jeu.getMergedListeEtoile())
 
     def launchPress(self,listeEtoileDepart,etoileDestination,force):

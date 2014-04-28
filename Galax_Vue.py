@@ -148,17 +148,17 @@ class Vue:
                         destY = self.normPosY(self.etoileDestination.posY)+16
                         cursorX = posX+16
                         cursorY = posY+16
-                        self.canvas.delete('cursorDest')
+                        self.canvas.delete('surfaceDejeu')
                         self.canvas.create_image(cursorX, cursorY, 
                                                  image=self.imageCursorDestination.image, 
                                                  anchor=CENTER,tags=('cursorDest','surfaceDejeu'))
-                        self.canvas.delete('trajet')
                         self.canvas.delete('menu')
+                        self.drawSurfaceDeJeu()
                         self.drawInfosEtoileOrigin(self.etoileOrigin[len(self.etoileOrigin)-1])
                         self.drawInfosEtoileDestination(self.etoileDestination)
                         for etoile in self.etoileOrigin:
-                            oriX = self.normPosX(self.etoileOrigin[0].posX)+16
-                            oriY = self.normPosY(self.etoileOrigin[0].posY)+16
+                            oriX = self.normPosX(etoile.posX)+16
+                            oriY = self.normPosY(etoile.posY)+16
                             self.canvas.create_line(oriX,oriY, destX,destY,fill='white',tags=('trajet','surfaceDejeu'))
                             
                             
@@ -185,6 +185,7 @@ class Vue:
 #----------------------------------------------------------------------------------------
         
     def splashMessage(self,message):
+        print(message)
         splashBox = Text(width=self.root.winfo_width(), bg='black', fg='white', font=('Arial', 40),tags='splashBox')
         splashBox.delete(1.0, END)
         splashBox.place(height=100, x=0, y=self.root.winfo_height()/2)
@@ -210,13 +211,6 @@ class Vue:
         self.canvas.create_image(self.screenWidth-256,self.screenHeight-128,image=self.endTurnImg,anchor=NW,tags='endTurnButton')# dessin du boutton de fin de tour
         self.boutonFinDeTour()
 
-
-    def initSurfaceDessin(self):
-        self.etoileDestination = None
-        self.canvas.delete('slider')
-        self.canvas.delete('menuContour')
-        self.canvas.delete('surfaceDejeu')
-
     def resetSlider(self):
         self.canvas.delete('slider')
         self.dessineSliderFlottes()
@@ -234,10 +228,10 @@ class Vue:
         if(self.etoileOrigin):
             if(self.controlleur.isHumanMovePossible(self.etoileOrigin[0]) and self.etoileDestination):
                 boutonLaunchMax = Button(self.root,text="Launch MAX", command= lambda: self.actionBoutonLaunch(True))
-                self.b2_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunchMax,tags=('launcher','surfaceDejeu'))
+                self.b2_launchDansCanvas = self.canvas.create_window(650,715,window=boutonLaunchMax,tags=('launcher'))
                 if(len(self.etoileOrigin) == 1):
                     boutonLaunch = Button(self.root,text="LAUNCH!", command= lambda: self.actionBoutonLaunch(False))
-                    self.b_launchDansCanvas = self.canvas.create_window(650,680,window=boutonLaunch,tags=('launcher','surfaceDejeu'))
+                    self.b_launchDansCanvas = self.canvas.create_window(650,680,window=boutonLaunch,tags=('launcher'))
 
     def boutonFinDeTour(self):
         boutonFinTour = Button(self.root,width=20,height=1,text="Fin du tour",command=self.controlleur.gameLoop,bg='black',fg='red')
@@ -256,7 +250,11 @@ class Vue:
                                 bg='gray40',length=300)
             slider_dansCanvas = self.canvas.create_window(200,715,window=self.slider,tags=('slider','menuContour'))
 
-
+    def initSurfaceDeJeu(self):
+        self.etoileDestination = None
+        self.canvas.delete('slider')
+        self.canvas.delete('menuContour')
+        self.canvas.delete('surfaceDejeu')
 
     def drawSurfaceDeJeu(self):
         self.canvas.create_image(0,0,image=self.background,anchor=NW)
