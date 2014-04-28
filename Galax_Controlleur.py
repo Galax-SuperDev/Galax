@@ -43,8 +43,10 @@ class Controlleur:
             return 
         if(self.jeu.listeFaction[1].isDead()):
             self.vue.splashMessage("Les Gubrus sont vaincus")
+            self.jeu.listeFaction.remove(self.jeu.gubru)
         if(self.jeu.listeFaction[2].isDead()):
             self.vue.splashMessage("Les Czins sont vaincus")
+            self.jeu.listeFaction.remove(self.jeu.czin)
         
         for etoile in self.vue.etoileOrigin:
             if(self.isStillHumain(etoile)):

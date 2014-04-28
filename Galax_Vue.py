@@ -115,9 +115,12 @@ class Vue:
                                 self.etoileOrigin.append(e)
                                 self.etoileDestination = None
                                 self.canvas.delete('menu')
-                                self.drawInfosEtoileOrigin(self.derniereEtoileClickGauche)
+                                
                                 if(len(self.etoileOrigin) == 1):
                                     self.dessineSliderFlottes()
+                                    self.drawInfosEtoileOrigin(self.derniereEtoileClickGauche)
+                                else:
+                                    self.drawInfosTotalFlotte()
                                 break
                         else:
                             self.etoileOrigin[:] = []  
@@ -154,15 +157,15 @@ class Vue:
                                                  anchor=CENTER,tags=('cursorDest','surfaceDejeu'))
                         self.canvas.delete('menu')
                         self.drawSurfaceDeJeu()
-                        self.drawInfosEtoileOrigin(self.etoileOrigin[len(self.etoileOrigin)-1])
+                        if(len(self.etoileOrigin) == 1):
+                            self.drawInfosEtoileOrigin(self.derniereEtoileClickGauche)
+                        else:
+                            self.drawInfosTotalFlotte()
                         self.drawInfosEtoileDestination(self.etoileDestination)
                         for etoile in self.etoileOrigin:
                             oriX = self.normPosX(etoile.posX)+16
                             oriY = self.normPosY(etoile.posY)+16
                             self.canvas.create_line(oriX,oriY, destX,destY,fill='white',tags=('trajet','surfaceDejeu'))
-                            
-                            
-
                         
     '''
     def resize(self,event):
@@ -186,13 +189,14 @@ class Vue:
         
     def splashMessage(self,message):
         print(message)
-        splashBox = Text(width=self.root.winfo_width(), bg='black', fg='white', font=('Arial', 40),tags='splashBox')
+        splashBox = Text(width=self.root.winfo_width(), bg='black', fg='white', font=('Arial', 40))
         splashBox.delete(1.0, END)
         splashBox.place(height=100, x=0, y=self.root.winfo_height()/2)
         splashBox.insert(INSERT,message)
         self.root.update()
         time.sleep(1)
-        self.root.delete('splashBox')
+        splashBox.pack_forget()
+        splashBox.place_forget()
 
         
     def drawJeu(self,listeEtoiles):
@@ -287,10 +291,20 @@ class Vue:
                 self.listeIndexSkinEtoile.append(random.randint(0,7))
             self.canvas.create_image(posX, posY, image=self.imagesPlanete[self.listeIndexSkinEtoile[i]].image, anchor=NW,tags=("etoile",'surfaceDejeu'))
 
+    def drawInfosTotalFlotte(self):
+        total = 0
+        for etoile in self.etoileOrigin:
+            total += etoile.flotteStationnaire.nbVaisseaux
+        self.canvas.create_text(self.screenWidth-220,58,anchor=NW,
+                text="Force de la coalition : ",fill='white',
+                font=('consolas','10'),
+                tags=('menu','menuContour'))
+        self.canvas.create_text(self.screenWidth-220,80,anchor=NW,
+                text=str(total),fill='white',
+                font=('consolas','18'),
+                tags=('menu','menuContour'))
 
-            
     def drawInfosEtoileOrigin(self,etoile):  
-             
         self.canvas.create_text(self.screenWidth-220,58,anchor=NW,
                 text="Owner:"+str(etoile.owner.nom),fill='white',
                 font=('consolas','10'),
