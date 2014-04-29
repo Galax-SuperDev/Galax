@@ -194,11 +194,13 @@ class Vue:
 
         
     def drawJeu(self,listeEtoiles):
+        self.etoileDestination = None
         self.listeEtoiles = listeEtoiles
         self.canvas.delete('all')
         self.drawSurfaceDeJeu()
-        self.drawBottomMenu()
         self.drawSideMenu()
+        self.drawBottomMenu()
+        self.resetSlider()
         
     def drawSideMenu(self):
         self.canvas.create_image(self.screenWidth-256,0,image=self.sideBarLeftImg,anchor=NW,tags='menuBar')
