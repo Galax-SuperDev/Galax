@@ -136,6 +136,7 @@ class Faction:
                             if(distance < distancePlusProche):
                                 etoilePlusProche = etoile
         else:
+            print(etoilePlusProche.nom)
             return etoilePlusProche
 
     def reorganisationDesFlottes(self):
@@ -177,21 +178,24 @@ class Czin(Faction):
         return self.parent.anneePassees+1 * self.nbr_vaisseaux_par_attaque * self.force_attaque_basique
 
     def reorganisationDesFlottes(self):
-        if(self.etoileBase.owner.nom is not "Czin"): #si les Czin perdent leur base, ils se replient vers leur etoile en position listeEtoile[0]
-            self.etoileBase = self.listeEtoile[0]
-            self.mode = mode_rassemblement_forces
-        ceci = True
-        while ceci is True:
-            if(self.mode == self.mode_etablir_base):
-                print("modeEtablirBase")
-                ceci = self.etablirBase()
-            if(self.mode == self.mode_conquerir_grappe):
-                print("mode_conquerir_grappe")
-                ceci = self.conquerirGrappe()
-            if(self.mode == self.mode_rassemblement_forces):
-                print("mode_rassemblement_forces")
-                self.rassemblementForces()
-                ceci = self.changementModRassemblementForce()
+        if(not self.isDead()):
+            if(self.etoileBase.owner.nom is not "Czin"): #si les Czin perdent leur base, ils se replient vers leur etoile en position listeEtoile[0]
+                self.etoileBase = self.listeEtoile[0]
+                self.mode = self.mode_rassemblement_forces
+            ceci = True
+            while ceci is True:
+                if(self.mode == self.mode_etablir_base):
+                    print("modeEtablirBase")
+                    ceci = self.etablirBase()
+                elif(self.mode == self.mode_conquerir_grappe):
+                    print("mode_conquerir_grappe")
+                    ceci = self.conquerirGrappe()
+                elif(self.mode == self.mode_rassemblement_forces):
+                    print("mode_rassemblement_forces")
+                    self.rassemblementForces()
+                    ceci = self.changementModRassemblementForce()
+        else:
+            print("Czin dead")
 
     def etablirBase(self):
         if(self.armadaPasEnvoyer):
