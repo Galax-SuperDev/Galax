@@ -86,8 +86,6 @@ class Jeu:
 
     def etoilesMereAssezLoin(self,etoile1,etoile2):
         if(etoile1.owner.nom is not "Neutral" and etoile2.owner.nom is not "Neutral"):
-            print(etoile1.nom)
-            print(etoile2.nom)
             if(etoile1.owner.getDistance(etoile1,etoile2) > 10):
                 return True
             else:
