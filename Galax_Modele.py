@@ -65,7 +65,7 @@ class Jeu:
 
 
     def lancerFlotteHumain(self,etoileDepart,etoileDestination,force):
-    	etoileDepart.envoyerNouvelleFlotte(force,etoileDestination)
+        etoileDepart.envoyerNouvelleFlotte(force,etoileDestination)
 
     def setPositionEtoile(self):  #attribut une position au hasare au etoiles en verifiant de ne pas en mettre sur une etoile existante
         for faction in self.listeFaction:
@@ -86,12 +86,19 @@ class Jeu:
 
     def etoilesMereAssezLoin(self,etoile1,etoile2):
         if(etoile1.owner.nom is not "Neutral" and etoile2.owner.nom is not "Neutral"):
-            if(etoile1.owner.getDistance(etoile1,etoile2) > 10):
+            if(etoile1.owner.getDistance(etoile1,etoile2) > 14):#attention, une valeur trop haute risque de faire une boucle infini dans setPositionEtoile
                 return True
             else:
                 return False
         else:
             return True
+
+    def getSomeDead(self):
+        for faction in self.listeFaction:
+            if(faction.isDead()):
+                return faction
+        else:
+            return None
 
 
 
@@ -136,7 +143,7 @@ class Faction:
                             if(distance < distancePlusProche):
                                 etoilePlusProche = etoile
         else:
-            print("l'etoile la plus proche est : " + etoilePlusProche.nom)
+            print("l'etoile la plus proche de:"+etoileSujet.nom+" est : " + etoilePlusProche.nom)
             return etoilePlusProche
 
     def reorganisationDesFlottes(self):
@@ -178,24 +185,21 @@ class Czin(Faction):
         return self.parent.anneePassees+1 * self.nbr_vaisseaux_par_attaque * self.force_attaque_basique
 
     def reorganisationDesFlottes(self):
-        if(not self.isDead()):
-            if(self.etoileBase.owner.nom is not "Czin"): #si les Czin perdent leur base, ils se replient vers leur etoile en position listeEtoile[0]
-                self.etoileBase = self.listeEtoile[0]
-                self.mode = self.mode_rassemblement_forces
-            ceci = True
-            while ceci is True:
-                if(self.mode == self.mode_etablir_base):
-                    print("modeEtablirBase")
-                    ceci = self.etablirBase()
-                elif(self.mode == self.mode_conquerir_grappe):
-                    print("mode_conquerir_grappe")
-                    ceci = self.conquerirGrappe()
-                elif(self.mode == self.mode_rassemblement_forces):
-                    print("mode_rassemblement_forces")
-                    self.rassemblementForces()
-                    ceci = self.changementModRassemblementForce()
-        else:
-            print("Czin dead")
+        if(self.etoileBase.owner.nom is not "Czin"): #si les Czin perdent leur base, ils se replient vers leur etoile en position listeEtoile[0]
+            self.etoileBase = self.listeEtoile[0]
+            self.mode = mode_rassemblement_forces
+        ceci = True
+        while ceci is True:
+            if(self.mode == self.mode_etablir_base):
+                print("modeEtablirBase")
+                ceci = self.etablirBase()
+            if(self.mode == self.mode_conquerir_grappe):
+                print("mode_conquerir_grappe")
+                ceci = self.conquerirGrappe()
+            if(self.mode == self.mode_rassemblement_forces):
+                print("mode_rassemblement_forces")
+                self.rassemblementForces()
+                ceci = self.changementModRassemblementForce()
 
     def etablirBase(self):
         if(self.armadaPasEnvoyer):

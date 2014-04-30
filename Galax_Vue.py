@@ -7,7 +7,6 @@ class Vue:
     def __init__(self,controlleur):
         self.compteurEtoile = 0
         self.controlleur = controlleur
-        self.derniereEtoileClickGauche = None
         self.listeEtoiles = []
         self.listeIndexSkinEtoile = []
         self.etatVue = 0
@@ -107,29 +106,26 @@ class Vue:
             for e in self.listeEtoiles:
                 posX = self.normPosX(e.posX)
                 posY = self.normPosY(e.posY)
-                if(eventX >= posX and eventX <= posX+32):
-                    if(eventY >= posY and eventY <= posY+32):#si click sur etoile
-                        self.derniereEtoileClickGauche = e
-                        if(e.owner.nom == "Humain"):    #si humain
-                            if(not self.etoileOrigin.count(e)): #si l'etoile en question n'est pas deja selectionne
-                                self.etoileOrigin.append(e)
-                                self.etoileDestination = None
-                                self.canvas.delete('menu')
-                                
-                                if(len(self.etoileOrigin) == 1):
-                                    self.dessineSliderFlottes()
-                                    self.drawInfosEtoileOrigin(self.derniereEtoileClickGauche)
-                                else:
-                                    self.drawInfosTotalFlotte()
-                                break
+                if(eventX >= posX and eventX <= posX+32 and eventY >= posY and eventY <= posY+32):
+                    self.canvas.delete('menu')
+                    if(e.owner.nom == "Humain"):    #si humain
+                        self.etoileDestination = None
+                        if(not self.etoileOrigin.count(e)): #si l'etoile en question n'est pas deja selectionne
+                            self.etoileOrigin.append(e)
                         else:
-                            self.etoileOrigin[:] = []  
+                            self.etoileOrigin.remove(e)
+                    else:
+                        self.etoileOrigin[:] = []
+                        if(self.etoileDestination and self.etoileDestination.nom == e.nom):
+                            self.etoileDestination = None
+                        else:
                             self.etoileDestination = e
-                            self.canvas.delete('menu')
-                            self.drawInfosEtoileDestination(self.derniereEtoileClickGauche)
-                                 
+                    break
+                                     
             else:
                 self.etoileOrigin[:] = []#sinon vide la selection
+                self.etoileDestination = None
+            self.actualiserInfo()
             self.drawSurfaceDeJeu()
 
     def rightClick(self,event):
@@ -158,7 +154,7 @@ class Vue:
                         self.canvas.delete('menu')
                         self.drawSurfaceDeJeu()
                         if(len(self.etoileOrigin) == 1):
-                            self.drawInfosEtoileOrigin(self.derniereEtoileClickGauche)
+                            self.drawInfosEtoileOrigin(self.etoileOrigin[len(self.etoileOrigin)-1])
                         else:
                             self.drawInfosTotalFlotte()
                         self.drawInfosEtoileDestination(self.etoileDestination)
@@ -181,16 +177,26 @@ class Vue:
 #---------------------   JEU  -----------------------------------------------------------  
 #----------------------------------------------------------------------------------------
         
-    def splashMessage(self,message):
+    def splashMessage(self,message,tempsAffichage):
         print(message)
         splashBox = Text(width=self.root.winfo_width(), bg='black', fg='white', font=('Arial', 40))
         splashBox.delete(1.0, END)
         splashBox.place(height=100, x=0, y=self.root.winfo_height()/2)
         splashBox.insert(INSERT,message)
         self.root.update()
-        time.sleep(1)
+        time.sleep(tempsAffichage)
         splashBox.pack_forget()
         splashBox.place_forget()
+
+    def actualiserInfo(self):
+        self.canvas.delete('menu')
+        if(len(self.etoileOrigin) == 1):
+            self.dessineSliderFlottes()
+            self.drawInfosEtoileOrigin(self.etoileOrigin[len(self.etoileOrigin)-1])
+        elif(len(self.etoileOrigin) > 1):
+            self.drawInfosTotalFlotte()
+        if(self.etoileDestination):
+            self.drawInfosEtoileDestination(self.etoileDestination)
 
         
     def drawJeu(self,listeEtoiles):
@@ -221,8 +227,8 @@ class Vue:
             self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.etoileOrigin[0].flotteStationnaire.nbVaisseaux)
         else:
             self.controlleur.launchPress(self.etoileOrigin,self.etoileDestination,self.slider.get())
-        if(len(self.etoileOrigin) == 1):
-            self.resetSlider()
+        self.actualiserInfo()
+        self.resetSlider()
 
     def drawBoutonLaunch(self):
         if(self.etoileOrigin):
@@ -243,7 +249,7 @@ class Vue:
 
         # dessin du slider de gestion des flottes --------------------------------------
     def dessineSliderFlottes(self): 
-        if(self.etoileOrigin):
+        if(self.etoileOrigin and len(self.etoileOrigin) == 1):
             if(self.controlleur.isHumanMovePossible(self.etoileOrigin[0])):
                 self.slider = Scale(self.root,from_=0,to=int(self.etoileOrigin[0].flotteStationnaire.nbVaisseaux),
                                 orient=HORIZONTAL,label="Nombres de vaisseaux a envoyer",
@@ -251,7 +257,6 @@ class Vue:
             slider_dansCanvas = self.canvas.create_window(200,715,window=self.slider,tags=('slider','menuContour'))
 
     def initSurfaceDeJeu(self):
-        self.etoileDestination = None
         self.canvas.delete('slider')
         self.canvas.delete('menuContour')
         self.canvas.delete('surfaceDejeu')

@@ -22,38 +22,17 @@ class Controlleur:
     def gameLoop(self):
         print("********** Movement IA ****************************")
         self.jeu.gestionTroupes()
-        print("********** Gestion d'une annee ********************")
+        print("********** Gestion de l'annee "+str(self.jeu.anneePassees)+" ******************")
         for i in range(10):
             print("********** "+str(i)+"/10 ***********************************")
             self.jeu.moveFlotteEnMouvement()
         self.jeu.ajoutVaisseau()
         self.jeu.anneePassees +=1
 
-        if(self.jeu.listeFaction[0].isDead()):
-            self.vue.drawFinPartie(False)
-            self.vue.drawMainMenu()
-            self.vue.etatVue = 0
-            self.jeu = None
-            return
-        if(self.jeu.listeFaction[1].isDead() and self.jeu.listeFaction[2].isDead()):
-            self.vue.drawFinPartie(True)
-            self.vue.drawMainMenu()
-            self.vue.etatVue = 0
-            self.jeu = None
-            return 
-        if(self.jeu.listeFaction[1].isDead()):
-            self.vue.splashMessage("Les Gubrus sont vaincus")
-            self.jeu.listeFaction.remove(self.jeu.gubru)
-        if(self.jeu.listeFaction[2].isDead()):
-            self.vue.splashMessage("Les Czins sont vaincus")
-            self.jeu.listeFaction.remove(self.jeu.czin)
+        self.checkEndGame()
+        self.vue.listeEtoiles = self.jeu.getMergedListeEtoile()
+        self.checkSiToutesLesEtoilesSelectionneesSontEncoreA_Moi()
         
-        for etoile in self.vue.etoileOrigin:
-            if(self.isStillHumain(etoile)):
-                pass #good, cette etoile t'appartient encore!
-            else: #ohoh...
-                self.vue.etoileOrigin.remove(etoile)
-
         print("********** Mouvement du joueur ********************")
         self.vue.drawJeu(self.jeu.getMergedListeEtoile())
 
@@ -77,6 +56,41 @@ class Controlleur:
     def setJeu(self,nbEtoile = 40):
         if(not self.jeu):#si la partie n'existe pas
             self.jeu = Galax_Modele.Jeu(nbEtoile)
+
+    def checkEndGame(self):
+        while True:
+            unMort = self.jeu.getSomeDead()
+
+            if(unMort):
+                message = "Les " + str(unMort.nom) + " sont vaincus"
+                self.vue.splashMessage(message, 2)
+                self.jeu.listeFaction.remove(unMort)
+
+                if(unMort.nom == "Humain"):
+                    self.vue.splashMessage("Vous avez perdu!", 5)
+                    self.vue.drawMainMenu()
+                    self.vue.etatVue = 0
+                    self.jeu = None
+                    return True
+                elif(len(self.jeu.listeFaction) == 1):
+                    self.vue.splashMessage("Vous avez gagnez!", 5)
+                    self.vue.drawMainMenu()
+                    self.vue.etatVue = 0
+                    self.jeu = None
+                    return True
+
+            else:
+                return None
+            
+
+    def checkSiToutesLesEtoilesSelectionneesSontEncoreA_Moi(self):
+        for etoile in self.vue.etoileOrigin:
+            if(self.isStillHumain(etoile)):
+                pass #good, cette etoile t'appartient encore!
+            else: #ohoh...
+                self.vue.etoileOrigin.remove(etoile)
+            if(len(self.vue.etoileOrigin) == 0):
+                self.vue.etoileOrigin = None
 
             
 
