@@ -136,7 +136,7 @@ class Faction:
                             if(distance < distancePlusProche):
                                 etoilePlusProche = etoile
         else:
-            print(etoilePlusProche.nom)
+            print("l'etoile la plus proche est : " + etoilePlusProche.nom)
             return etoilePlusProche
 
     def reorganisationDesFlottes(self):
