@@ -412,7 +412,7 @@ class Vue:
         self.buttonPosY3 = self.screenHeight/3 + (self.buttonHeight*2) + 4
         self.buttonPosY4 = self.screenHeight/3 + (self.buttonHeight*3) + 6
         
-        self.canvas.delete("menu")
+        self.canvas.delete("all")
         
         self.canvas.create_rectangle(self.buttonPosX, self.buttonPosY1,
                                      self.buttonPosX+self.buttonWidth, self.buttonPosY1+self.buttonHeight, 

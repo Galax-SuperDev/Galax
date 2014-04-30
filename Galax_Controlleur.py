@@ -28,8 +28,9 @@ class Controlleur:
             self.jeu.moveFlotteEnMouvement()
         self.jeu.ajoutVaisseau()
         self.jeu.anneePassees +=1
-
-        self.checkEndGame()
+        
+        if(self.checkEndGame()):
+            return
         self.vue.listeEtoiles = self.jeu.getMergedListeEtoile()
         self.checkSiToutesLesEtoilesSelectionneesSontEncoreA_Moi()
         
