@@ -222,8 +222,9 @@ class Czin(Faction):
             return False
     def conquerirGrappe(self):
         nbEnvoi = self.getForceAttaque()
+        print(self.etoileBase.flotteStationnaire.nbVaisseaux/5 - 1)
         if(self.etoileBase.flotteStationnaire.nbVaisseaux >= nbEnvoi*5):
-            nbEnvoi = Integer(self.etoileBase.flotteStationnaire.nbVaisseaux/5 - 1)
+            nbEnvoi = int(self.etoileBase.flotteStationnaire.nbVaisseaux/5 - 1)
             for i in range(5):
                 self.etoileBase.envoyerNouvelleFlotte(nbEnvoi,self.trouverEtoilePlusProche(self.etoileBase))
         else:
