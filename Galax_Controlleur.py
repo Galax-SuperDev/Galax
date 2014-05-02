@@ -65,15 +65,16 @@ class Controlleur:
             if(unMort):
                 message = "Les " + str(unMort.nom) + " sont vaincus"
                 self.vue.splashMessage(message, 2)
-                self.jeu.listeFaction.remove(unMort)
-
+                for i in range(len(self.jeu.listeFaction)-1):
+                    if(unMort.nom == self.jeu.listeFaction[i].nom):
+                        self.jeu.listeFaction.remove(self.jeu.listeFaction[i])
                 if(unMort.nom == "Humain"):
                     self.vue.splashMessage("Vous avez perdu!", 5)
                     self.vue.drawMainMenu()
                     self.vue.etatVue = 0
                     self.jeu = None
                     return True
-                elif(len(self.jeu.listeFaction) == 1):
+                elif(len(self.jeu.listeFaction) == 2 and self.jeu.listeFaction[len(self.jeu.listeFaction)-1].nom == "Neutral"):
                     self.vue.splashMessage("Vous avez gagnez!", 5)
                     self.vue.drawMainMenu()
                     self.vue.etatVue = 0
@@ -85,13 +86,14 @@ class Controlleur:
             
 
     def checkSiToutesLesEtoilesSelectionneesSontEncoreA_Moi(self):
-        for etoile in self.vue.etoileOrigin:
-            if(self.isStillHumain(etoile)):
-                pass #good, cette etoile t'appartient encore!
-            else: #ohoh...
-                self.vue.etoileOrigin.remove(etoile)
-            if(len(self.vue.etoileOrigin) == 0):
-                self.vue.etoileOrigin = None
+        if(self.jeu.listeFaction[0].listeEtoile and self.vue.etoileOrigin):
+            for etoile in self.vue.etoileOrigin:
+                if(self.isStillHumain(etoile)):
+                    pass #good, cette etoile t'appartient encore!
+                else: #ohoh...
+                    self.vue.etoileOrigin.remove(etoile)
+                if(len(self.vue.etoileOrigin) == 0):
+                    self.etoileOrigin[:] = []
 
             
 
